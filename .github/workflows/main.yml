@@ -27,23 +27,25 @@ jobs:
 
           PARTS=( ${MAJOR} ".${MINOR}" ".${RELEASE}" )
 
+          echo ${PARTS}
+
           TAG=''
           for PART in $PARTS; do
             TAG+="${PART}"
 
-            docker tag laravel-alpine:latest "laravel-alpine:${TAG}"
+            docker tag laravel-alpine:latest "ghcr.io/iksaku/laravel-alpine:${TAG}"
           done
 
           # Exclude 'latest' tag from deployment
           docker rmi laravel-alpine:latest
 
-          echo $(docker image ls laravel-alpine)
+          echo $(docker image ls ghcr.io/iksaku/laravel-alpine)
       
       - name: Push Image
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
           
-          docker push --all-tags laravel-alpine
+          docker push --all-tags ghcr.io/iksaku/laravel-alpine
 
   # build_octane:
   #   name: 'laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}'
