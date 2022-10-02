@@ -58,7 +58,7 @@ jobs:
     strategy:
       matrix:
         php: [8.1]
-        runtime: ['roadrunner']
+        runtime: ['roadrunner', 'swoole']
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
