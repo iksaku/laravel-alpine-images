@@ -39,6 +39,8 @@ jobs:
       - name: Push Image
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+          docker image ls
           
           docker push --all-tags ghcr.io/iksaku/laravel-alpine
 
@@ -59,7 +61,7 @@ jobs:
           docker build \
             --build-arg PHP_VERSION=${{ matrix.php }} \
             -t laravel-alpine:latest \
-            -f Dockerfile.octane.${{ matrix.runtime }} \
+            -f ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }} \
             ${{ matrix.php }}
       
       - name: Assign Tags
