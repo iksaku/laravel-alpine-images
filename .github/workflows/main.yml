@@ -36,6 +36,8 @@ jobs:
 
           # Exclude 'latest' tag from deployment
           docker rmi laravel-alpine:latest
+
+          echo $(docker image ls)
       
       - name: Push Image
         run: |
