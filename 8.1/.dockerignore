@@ -1,0 +1,26 @@
+# Based of @fideloper's Fly.io template
+# https://github.com/superfly/flyctl/blob/698f3bda500015354773a2544c90f0b2a6b5ca3a/scanner/templates/laravel/.dockerignore
+
+# 1. Ignore Laravel-specific files we don't need
+bootstrap/cache/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+*.env*
+.rr.yaml
+rr
+
+# 2. Ignore common files/directories we don't need
+.vscode
+.idea
+vendor
+**/*node_modules
+**.git
+**.gitignore
+**.gitattributes
+**.sass-cache
+**/*~
+**/*.log
+**/.DS_Store
+**/Thumbs.db

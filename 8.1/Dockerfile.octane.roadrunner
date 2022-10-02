@@ -1,0 +1,18 @@
+ARG PHP_VERSION
+
+FROM laravel-alpine:${PHP_VERSION}
+
+# Override supervisord to use Octane
+RUN sed -i \
+    's/artisan serve/artisan octane:start --server=roadrunner --rpc-port=6001/' \
+    /usr/local/etc/supervisor/conf.d/supervisord.conf
+
+# Install PHP extensions required by Octane
+RUN install-php-extensions pcntl sockets
+
+# Install RoadRunner binary
+COPY --from=ghcr.io/roadrunner-server/roadrunner:2.11.3 /usr/bin/rr /usr/local/bin/rr
+
+EXPOSE 8080
+
+ENTRYPOINT ["start-container"]
