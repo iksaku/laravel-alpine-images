@@ -1,6 +1,6 @@
 ARG PHP_VERSION
 
-FROM laravel-alpine:${PHP_VERSION}
+FROM ghcr.io/iksaku/laravel-alpine:${PHP_VERSION}
 
 # Override supervisord to use Octane
 RUN sed -i \

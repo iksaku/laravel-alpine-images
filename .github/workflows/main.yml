@@ -46,6 +46,7 @@ jobs:
   build_octane:
     name: 'laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}'
     runs-on: ubuntu-latest
+    needs: build
     strategy:
       matrix:
         php: [8.1]
