@@ -58,7 +58,7 @@ jobs:
       - name: Build image
         run: |
           docker build \
-            --build_arg PHP_VERSION=${{ matrix.php }} \
+            --build-arg PHP_VERSION=${{ matrix.php }} \
             -t laravel-alpine:latest \
             -f Dockerfile.octane.${{ matrix.octane }} \
             ${{ matrix.php }}
