@@ -40,12 +40,12 @@ services:
     laravel.test:
         build:
             context: ./vendor/laravel/sail/runtimes/8.1
--            args:
--                WWWGROUP: '${WWWGROUP}'
+-           args:
+-               WWWGROUP: '${WWWGROUP}'
 #        ports: ...
         envrionment:
             WWWUSER: '${WWWUSER}'
-+            WWWGROUP: '${WWWGROUP}'
++           WWWGROUP: '${WWWGROUP}'
 #            ...
 ```
 
@@ -54,9 +54,9 @@ option with `image` in your `docker-compose.yml` file:
 ```diff
 services:
     laravel.test:
--        build:
--            context: ./vendor/laravel/sail/runtimes/8.1
-+        image: laravel-alpine:8.1
+-       build:
+-           context: ./vendor/laravel/sail/runtimes/8.1
++       image: ghcr.io/iksaku/laravel-alpine:8.1
 ```
 
 > **Note**
@@ -72,9 +72,9 @@ If you opt into customizing your image, then work with the `build` option in you
 services:
     laravel.test:
         build:
--            context: ./vendor/laravel/sail/runtimes/8.1
-            context: .
-            dockerfile: ./path/to/your/Dockerfile
+-           context: ./vendor/laravel/sail/runtimes/8.1
++           context: .
++           dockerfile: ./path/to/your/Dockerfile
 ```
 
 ## Deploying to Production
@@ -82,7 +82,7 @@ services:
 TODO...
 
 ```dockerfile
-FROM laravel-alpine:8.1
+FROM ghcr.io/iksaku/laravel-alpine:8.1
 
 COPY shared/crontab /usr/local/etc/crontab
 RUN /usr/bin/crontab /usr/local/etc/crontab

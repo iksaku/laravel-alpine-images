@@ -1,6 +1,14 @@
 name: Image Builder
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+  pull-request:
+    paths-ignore:
+      - '**.md'
+  schedule:
+    - cron: '0 7 * * 1'
 
 jobs:
   build:
@@ -37,6 +45,7 @@ jobs:
           docker rmi laravel-alpine:latest
       
       - name: Push Image
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
           
@@ -80,6 +89,7 @@ jobs:
           docker rmi laravel-alpine:latest
 
       - name: Push Image
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
           
