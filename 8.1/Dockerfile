@@ -40,3 +40,7 @@ COPY shared/supervisord.conf /usr/local/etc/supervisor/conf.d/supervisord.conf
 RUN mkdir -p /var/log/supervisor/
 
 RUN useradd -ms /bin/sh -u 1337 -U laravel
+
+EXPOSE 8080
+
+ENTRYPOINT ["start-container"]

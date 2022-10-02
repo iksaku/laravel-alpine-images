@@ -12,7 +12,3 @@ RUN install-php-extensions pcntl sockets
 
 # Install RoadRunner binary
 COPY --from=ghcr.io/roadrunner-server/roadrunner:2.11.3 /usr/bin/rr /usr/local/bin/rr
-
-EXPOSE 8080
-
-ENTRYPOINT ["start-container"]

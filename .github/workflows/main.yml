@@ -22,7 +22,7 @@ jobs:
       - name: Assign Tags
         run: |
           VERSION='${{ matrix.php }}'
-          RELEASE=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_RELEASE_VERSION;')
+          RELEASE=$(docker run --rm laravel-alpine:latest /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
 
           PARTS=( ${VERSION} ".${RELEASE}" )
 
@@ -39,8 +39,6 @@ jobs:
       - name: Push Image
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
-
-          docker image ls
           
           docker push --all-tags ghcr.io/iksaku/laravel-alpine
 
@@ -67,7 +65,7 @@ jobs:
       - name: Assign Tags
         run: |
           VERSION='${{ matrix.php }}'
-          RELEASE=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_RELEASE_VERSION;')
+          RELEASE=$(docker run --rm laravel-alpine:latest /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
 
           PARTS=( ${VERSION} ".${RELEASE}" )
 
