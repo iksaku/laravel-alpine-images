@@ -83,4 +83,4 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
           
-          docker push --all-tags laravel-alpine
+          docker push --all-tags ghcr.io/iksaku/laravel-alpine
