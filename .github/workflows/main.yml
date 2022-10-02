@@ -21,11 +21,10 @@ jobs:
 
       - name: Assign Tags
         run: |
-          MAJOR=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_MAJOR_VERSION;')
-          MINOR=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_MINOR_VERSION;')
+          VERSION='${{ matrix.php }}'
           RELEASE=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_RELEASE_VERSION;')
 
-          PARTS=( "${MAJOR}.${MINOR}" ".${RELEASE}" )
+          PARTS=( ${VERSION} ".${RELEASE}" )
 
           TAG=''
           for PART in ${PARTS[@]}; do
@@ -60,22 +59,21 @@ jobs:
           docker build \
             --build-arg PHP_VERSION=${{ matrix.php }} \
             -t laravel-alpine:latest \
-            -f Dockerfile.octane.${{ matrix.octane }} \
+            -f Dockerfile.octane.${{ matrix.runtime }} \
             ${{ matrix.php }}
       
       - name: Assign Tags
         run: |
-          MAJOR=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_MAJOR_VERSION;')
-          MINOR=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_MINOR_VERSION;')
+          VERSION='${{ matrix.php }}'
           RELEASE=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_RELEASE_VERSION;')
 
-          PARTS=( "${MAJOR}.${MINOR}" ".${RELEASE}" )
+          PARTS=( ${VERSION} ".${RELEASE}" )
 
           TAG=''
           for PART in ${PARTS[@]}; do
             TAG+="${PART}"
 
-            docker tag laravel-alpine:latest "ghcr.io/iksaku/laravel-alpine:${TAG}-octane-${{ matrix.octane }}"
+            docker tag laravel-alpine:latest "ghcr.io/iksaku/laravel-alpine:${TAG}-octane-${{ matrix.runtime }}"
           done
 
           # Exclude 'latest' tag from deployment
