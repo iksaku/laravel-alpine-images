@@ -25,9 +25,7 @@ jobs:
           MINOR=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_MINOR_VERSION;')
           RELEASE=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_RELEASE_VERSION;')
 
-          PARTS=( ${MAJOR} ".${MINOR}" ".${RELEASE}" )
-
-          echo ${PARTS}
+          PARTS=( "${MAJOR}.${MINOR}" ".${RELEASE}" )
 
           TAG=''
           for PART in $PARTS; do
