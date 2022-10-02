@@ -1,10 +1,10 @@
 #!/usr/bin/env sh
 
-if [[ ! -z "$WWWUSER" ]];
+if [ ! -z "$WWWUSER" ];
     then usermod -u $WWWUSER laravel;
 fi
 
-if [[ ! -z "$WWWGROUP" ]];
+if [ ! -z "$WWWGROUP" ];
     then groupmod -g $WWWGROUP laravel;
 fi
 
