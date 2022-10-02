@@ -27,8 +27,10 @@ jobs:
 
           PARTS=( "${MAJOR}.${MINOR}" ".${RELEASE}" )
 
+          echo ${PARTS[@]}
+
           TAG=''
-          for PART in $PARTS; do
+          for PART in ${PARTS[@]}; do
             TAG+="${PART}"
 
             docker tag laravel-alpine:latest "ghcr.io/iksaku/laravel-alpine:${TAG}"
