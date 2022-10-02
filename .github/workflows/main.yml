@@ -29,7 +29,7 @@ jobs:
 
           TAG=''
           for PART in $PARTS; do
-            TAG="${TAG}${PART}"
+            TAG+="${PART}"
 
             docker tag laravel-alpine:latest "laravel-alpine:${TAG}"
           done
@@ -37,7 +37,7 @@ jobs:
           # Exclude 'latest' tag from deployment
           docker rmi laravel-alpine:latest
 
-          echo $(docker image ls)
+          echo $(docker image ls laravel-alpine)
       
       - name: Push Image
         run: |
@@ -74,13 +74,15 @@ jobs:
 
   #         TAG=''
   #         for PART in $PARTS; do
-  #           TAG="${TAG}${PART}"
+  #           TAG+="${PART}"
 
   #           docker tag laravel-alpine:latest "laravel-alpine:${TAG}-octane-${{ matrix.octane }}"
   #         done
 
   #         # Exclude 'latest' tag from deployment
   #         docker rmi laravel-alpine:latest
+
+  #         echo $(docker image ls laravel-alpine)
 
   #     - name: Push Image
   #       run: |
