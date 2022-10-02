@@ -27,8 +27,6 @@ jobs:
 
           PARTS=( "${MAJOR}.${MINOR}" ".${RELEASE}" )
 
-          echo ${PARTS[@]}
-
           TAG=''
           for PART in ${PARTS[@]}; do
             TAG+="${PART}"
@@ -38,8 +36,6 @@ jobs:
 
           # Exclude 'latest' tag from deployment
           docker rmi laravel-alpine:latest
-
-          echo $(docker image ls ghcr.io/iksaku/laravel-alpine)
       
       - name: Push Image
         run: |
@@ -47,47 +43,45 @@ jobs:
           
           docker push --all-tags ghcr.io/iksaku/laravel-alpine
 
-  # build_octane:
-  #   name: 'laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}'
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       php: [8.1]
-  #       runtime: ['roadrunner']
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
+  build_octane:
+    name: 'laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [8.1]
+        runtime: ['roadrunner']
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-  #     - name: Build image
-  #       run: |
-  #         docker build \
-  #           --build_arg PHP_VERSION=${{ matrix.php }} \
-  #           -t laravel-alpine:latest \
-  #           -f Dockerfile.octane.${{ matrix.octane }} \
-  #           ${{ matrix.php }}
+      - name: Build image
+        run: |
+          docker build \
+            --build_arg PHP_VERSION=${{ matrix.php }} \
+            -t laravel-alpine:latest \
+            -f Dockerfile.octane.${{ matrix.octane }} \
+            ${{ matrix.php }}
       
-  #     - name: Assign Tags
-  #       run: |
-  #         MAJOR=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_MAJOR_VERSION;')
-  #         MINOR=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_MINOR_VERSION;')
-  #         RELEASE=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_RELEASE_VERSION;')
+      - name: Assign Tags
+        run: |
+          MAJOR=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_MAJOR_VERSION;')
+          MINOR=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_MINOR_VERSION;')
+          RELEASE=$(docker run --rm laravel-alpine:latest php -r 'echo PHP_RELEASE_VERSION;')
 
-  #         PARTS=( ${MAJOR} ".${MINOR}" ".${RELEASE}" )
+          PARTS=( "${MAJOR}.${MINOR}" ".${RELEASE}" )
 
-  #         TAG=''
-  #         for PART in $PARTS; do
-  #           TAG+="${PART}"
+          TAG=''
+          for PART in ${PARTS[@]}; do
+            TAG+="${PART}"
 
-  #           docker tag laravel-alpine:latest "laravel-alpine:${TAG}-octane-${{ matrix.octane }}"
-  #         done
+            docker tag laravel-alpine:latest "ghcr.io/iksaku/laravel-alpine:${TAG}-octane-${{ matrix.octane }}"
+          done
 
-  #         # Exclude 'latest' tag from deployment
-  #         docker rmi laravel-alpine:latest
+          # Exclude 'latest' tag from deployment
+          docker rmi laravel-alpine:latest
 
-  #         echo $(docker image ls laravel-alpine)
-
-  #     - name: Push Image
-  #       run: |
-  #         echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+      - name: Push Image
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
           
-  #         docker push --all-tags laravel-alpine
+          docker push --all-tags laravel-alpine
