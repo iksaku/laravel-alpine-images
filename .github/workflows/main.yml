@@ -36,7 +36,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
-          docker push --all-tags ${IMAGE}
+          docker push --all-tags ghcr.io/iksaku/laravel-alpine
 
   build_octane:
     name: laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}
@@ -64,7 +64,7 @@ jobs:
           docker tag ${IMAGE} \
             $(sed "s/${{ matrix.php }}-/${{ matrix.php }}.${RELEASE}-/" <<< ${IMAGE})
 
-          docker image ls ${IMAGE}
+          docker image ls ghcr.io/iksaku/laravel-alpine
 
       - name: Push Image
         if: ${{ github.ref == 'refs/heads/main' }}
