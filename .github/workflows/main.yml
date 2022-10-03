@@ -62,7 +62,7 @@ jobs:
           
           RELEASE=$(docker run --rm ${IMAGE} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
           docker tag ${IMAGE} \
-            $(sed 's/${{ matrix.php }}-/${{ matrix.php }}.${RELEASE}-/' <<< ${IMAGE})
+            $(sed "s/${{ matrix.php }}-/${{ matrix.php }}.${RELEASE}-/" <<< ${IMAGE})
 
           docker image ls ${IMAGE}
 
