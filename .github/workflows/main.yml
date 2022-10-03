@@ -56,7 +56,7 @@ jobs:
         run: |
           docker build \
             --build-arg PHP_VERSION=${{ matrix.php }} \
-            -t ${IMAGE_PREFIX} \
+            -t ${IMAGE} \
             -f ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }} \
             ${{ matrix.php }}
           
