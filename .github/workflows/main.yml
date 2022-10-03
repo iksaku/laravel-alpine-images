@@ -30,7 +30,7 @@ jobs:
           RELEASE=$(docker run --rm ${IMAGE} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
           docker tag ${IMAGE} ${IMAGE}.${RELEASE}
 
-          docker image ls ${IMAGE}
+          docker image ls ghcr.io/iksaku/laravel-alpine
 
       - name: Push Image
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -64,6 +64,7 @@ jobs:
           docker tag ${IMAGE} \
             $(sed "s/${{ matrix.php }}-/${{ matrix.php }}.${RELEASE}-/" <<< ${IMAGE})
 
+          docker rmi ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
           docker image ls ghcr.io/iksaku/laravel-alpine
 
       - name: Push Image
