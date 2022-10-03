@@ -17,80 +17,70 @@ jobs:
     strategy:
       matrix:
         php: [8.1]
+    env:
+      MAIN_TAG: 'ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
       
-      - name: Build image
-        run: |
-          docker build \
-            -t laravel-alpine:latest \
-            ${{ matrix.php }}
+      - name: 'Build laravel-alpine:${{ matrix.php }}'
+        run: docker build -t ${MAIN_TAG} ${{ matrix.php }}
 
       - name: Assign Tags
+        env:
+          VERSION: ${{ matrix.php }}
         run: |
-          VERSION='${{ matrix.php }}'
-          RELEASE=$(docker run --rm laravel-alpine:latest /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
+          RELEASE=$(docker run --rm ${MAIN_TAG} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
 
-          PARTS=( ${VERSION} ".${RELEASE}" )
-
-          TAG=''
-          for PART in ${PARTS[@]}; do
-            TAG+="${PART}"
-
-            docker tag laravel-alpine:latest "ghcr.io/iksaku/laravel-alpine:${TAG}"
-          done
-
-          # Exclude 'latest' tag from deployment
-          docker rmi laravel-alpine:latest
+          docker tag ${MAIN_TAG} ${MAIN_TAG}.${RELEASE}
       
       - name: Push Image
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
           
-          docker push --all-tags ghcr.io/iksaku/laravel-alpine
+          docker push --all-tags ${MAIN_TAG}
 
-  build_octane:
-    name: 'laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}'
-    runs-on: ubuntu-latest
-    needs: build
-    strategy:
-      matrix:
-        php: [8.1]
-        runtime: ['roadrunner', 'swoole']
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+  # build_octane:
+  #   name: 'laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}'
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   strategy:
+  #     matrix:
+  #       php: [8.1]
+  #       runtime: ['roadrunner', 'swoole']
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
 
-      - name: Build image
-        run: |
-          docker build \
-            --build-arg PHP_VERSION=${{ matrix.php }} \
-            -t laravel-alpine:latest \
-            -f ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }} \
-            ${{ matrix.php }}
+  #     - name: Build image
+  #       run: |
+  #         docker build \
+  #           --build-arg PHP_VERSION=${{ matrix.php }} \
+  #           -t laravel-alpine:latest \
+  #           -f ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }} \
+  #           ${{ matrix.php }}
       
-      - name: Assign Tags
-        run: |
-          VERSION='${{ matrix.php }}'
-          RELEASE=$(docker run --rm laravel-alpine:latest /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
+  #     - name: Assign Tags
+  #       run: |
+  #         VERSION='${{ matrix.php }}'
+  #         RELEASE=$(docker run --rm laravel-alpine:latest /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
 
-          PARTS=( ${VERSION} ".${RELEASE}" )
+  #         PARTS=( ${VERSION} ".${RELEASE}" )
 
-          TAG=''
-          for PART in ${PARTS[@]}; do
-            TAG+="${PART}"
+  #         TAG=''
+  #         for PART in ${PARTS[@]}; do
+  #           TAG+="${PART}"
 
-            docker tag laravel-alpine:latest "ghcr.io/iksaku/laravel-alpine:${TAG}-octane-${{ matrix.runtime }}"
-          done
+  #           docker tag laravel-alpine:latest "ghcr.io/iksaku/laravel-alpine:${TAG}-octane-${{ matrix.runtime }}"
+  #         done
 
-          # Exclude 'latest' tag from deployment
-          docker rmi laravel-alpine:latest
+  #         # Exclude 'latest' tag from deployment
+  #         docker rmi laravel-alpine:latest
 
-      - name: Push Image
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+  #     - name: Push Image
+  #       if: ${{ github.ref == 'refs/heads/main' }}
+  #       run: |
+  #         echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
           
-          docker push --all-tags ghcr.io/iksaku/laravel-alpine
+  #         docker push --all-tags ghcr.io/iksaku/laravel-alpine
