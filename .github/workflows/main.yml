@@ -18,27 +18,22 @@ jobs:
       matrix:
         php: [8.1]
     env:
-      MAIN_TAG: 'ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}'
+      MAIN_TAG: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
       
-      - name: 'Build laravel-alpine:${{ matrix.php }}'
-        run: docker build -t ${MAIN_TAG} ${{ matrix.php }}
-
-      - name: Assign Tags
-        env:
-          VERSION: ${{ matrix.php }}
+      - name: Build laravel-alpine:${{ matrix.php }}
         run: |
-          RELEASE=$(docker run --rm ${MAIN_TAG} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
-
-          docker tag ${MAIN_TAG} ${MAIN_TAG}.${RELEASE}
+          docker build -t ${MAIN_TAG} ${{ matrix.php }}
+          docker tag ${MAIN_TAG} \
+            ${MAIN_TAG}.$(docker run --rm ${MAIN_TAG} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
+          docker image ls ghcr.io/iksaku/laravel-alpine
       
       - name: Push Image
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
-          
           docker push --all-tags ${MAIN_TAG}
 
   # build_octane:
