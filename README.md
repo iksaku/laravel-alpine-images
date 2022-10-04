@@ -45,7 +45,7 @@ services:
             context: ./vendor/laravel/sail/runtimes/8.1
 -           args:
 -               WWWGROUP: '${WWWGROUP}'
-#        ports: ...
+#       ...
         envrionment:
             WWWUSER: '${WWWUSER}'
 +           WWWGROUP: '${WWWGROUP}'
