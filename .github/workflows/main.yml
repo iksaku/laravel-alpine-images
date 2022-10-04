@@ -25,7 +25,7 @@ jobs:
         id: php_release
         run: echo "::set-output name=version::$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')"
 
-      - name: Generate Docker Metadata
+      - name: Generate Image Metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -47,9 +47,6 @@ jobs:
           context: ${{ matrix.php }}
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
-      
-      - name: '[Debug] List image tags'
-        run: docker image ls ghcr.io/iksaku/laravel-alpine
 
   build_octane:
     name: laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}
@@ -67,7 +64,7 @@ jobs:
         id: php_release
         run: echo "::set-output name=version::$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')"
 
-      - name: Generate Docker Metadata
+      - name: Generate Image Metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -89,6 +86,3 @@ jobs:
           context: ${{ matrix.php }}
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
-      
-      - name: '[Debug] List image tags'
-        run: docker image ls ghcr.io/iksaku/laravel-alpine
