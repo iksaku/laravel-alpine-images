@@ -32,8 +32,7 @@ jobs:
 
       - name: Get PHP Release Version
         id: php_release
-        run: |
-          echo "::set-output name=version::$(docker run --rm php:${{ matrix.php }}-cli-alpine /bin/sh php -r 'echo PHP_RELEASE_VERSION;')"
+        run: echo "::set-output name=version::$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')"
 
       - name: Docker meta
         id: meta
