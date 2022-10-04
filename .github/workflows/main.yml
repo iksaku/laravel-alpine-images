@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    name: laravel-alpine:${{ matrix.php }} | linux/${{ matrix.platform }}
+    name: 'linux/${{ matrix.platform }} php-${{ matrix.php }}'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -61,7 +61,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
 
   build_octane:
-    name: laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }} | linux/${{ matrix.platform }}
+    name: linux/${{ matrix.platform }} php-${{ matrix.php }} octane-${{ matrix.runtime }}
     runs-on: ubuntu-latest
     needs: build
     strategy:
