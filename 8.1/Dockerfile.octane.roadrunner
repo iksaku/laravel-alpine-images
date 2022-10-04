@@ -1,6 +1,4 @@
-ARG PHP_VERSION
-
-FROM ghcr.io/iksaku/laravel-alpine:${PHP_VERSION}
+FROM ghcr.io/iksaku/laravel-alpine:8.1
 
 # Override supervisord to use Octane
 RUN sed -i \
