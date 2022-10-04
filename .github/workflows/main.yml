@@ -34,6 +34,13 @@ jobs:
             type=raw,${{ matrix.php }}
             type=raw,${{ matrix.php }}.${{ steps.php_release.outputs.version }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -45,6 +52,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ${{ matrix.php }}
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
 
@@ -73,6 +81,13 @@ jobs:
             type=raw,${{ matrix.php }}-octane-${{ matrix.runtime }}
             type=raw,${{ matrix.php }}.${{ steps.php_release.outputs.version }}-octane-${{ matrix.runtime }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -85,5 +100,6 @@ jobs:
         with:
           context: ${{ matrix.php }}
           file: ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }}
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
