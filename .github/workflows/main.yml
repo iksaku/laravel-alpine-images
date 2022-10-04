@@ -12,11 +12,15 @@ on:
 
 jobs:
   build:
-    name: laravel-alpine:${{ matrix.php }}
+    name: laravel-alpine:${{ matrix.php }} | linux/${{ matrix.platform }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: [8.1]
+        php:
+          - 8.1
+        platform:
+          - amd64
+          - arm64
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -52,18 +56,24 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ${{ matrix.php }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/${{ matrix.platform }}
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
 
   build_octane:
-    name: laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}
+    name: laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }} | linux/${{ matrix.platform }}
     runs-on: ubuntu-latest
     needs: build
     strategy:
       matrix:
-        php: [8.1]
-        runtime: ['roadrunner', 'swoole']
+        php:
+          - 8.1
+        platform:
+          - amd64
+          - arm64
+        runtime:
+          - roadrunner
+          - swoole
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -100,6 +110,6 @@ jobs:
         with:
           context: ${{ matrix.php }}
           file: ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/${{ matrix.platform }}
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
