@@ -84,5 +84,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ${{ matrix.php }}
+          file: ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }}
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
