@@ -17,24 +17,15 @@ jobs:
     strategy:
       matrix:
         php: [8.1]
-    env:
-      IMAGE: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      
-      # - name: Build PHP ${{ matrix.php }} image
-      #   run: |
-      #     docker build -t ${IMAGE} ${{ matrix.php }}
-
-      #     RELEASE=$(docker run --rm ${IMAGE} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
-      #     docker tag ${IMAGE} ${IMAGE}.${RELEASE}
 
       - name: Get PHP Release Version
         id: php_release
         run: echo "::set-output name=version::$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')"
 
-      - name: Docker meta
+      - name: Generate Docker Metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -50,10 +41,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Push Image
-      #   if: ${{ github.ref == 'refs/heads/main' }}
-      #   run: docker push --all-tags ghcr.io/iksaku/laravel-alpine
-
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
@@ -64,42 +51,44 @@ jobs:
       - name: '[Debug] List image tags'
         run: docker image ls ghcr.io/iksaku/laravel-alpine
 
-  # build_octane:
-  #   name: laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   strategy:
-  #     matrix:
-  #       php: [8.1]
-  #       runtime: ['roadrunner', 'swoole']
-  #   env:
-  #     IMAGE: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
+  build_octane:
+    name: laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        php: [8.1]
+        runtime: ['roadrunner', 'swoole']
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      
+      - name: Get PHP Release Version
+        id: php_release
+        run: echo "::set-output name=version::$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')"
 
-  #     - name: Build PHP ${{ matrix.php }} and Octane Runtime '${{ matrix.runtime }}'
-  #       run: |
-  #         docker build \
-  #           --build-arg PHP_VERSION=${{ matrix.php }} \
-  #           -t ${IMAGE} \
-  #           -f ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }} \
-  #           ${{ matrix.php }}
-          
-  #         RELEASE=$(docker run --rm ${IMAGE} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')
-  #         docker tag ${IMAGE} \
-  #           $(sed "s/${{ matrix.php }}-/${{ matrix.php }}.${RELEASE}-/" <<< ${IMAGE})
+      - name: Generate Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/iksaku/laravel-alpine
+          tags: |
+            type=raw,${{ matrix.php }}-octane-${{ matrix.runtime }}
+            type=raw,${{ matrix.php }}.${{ steps.php_release.outputs.version }}-octane-${{ matrix.runtime }}
 
-  #         docker rmi ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - name: Login to GitHub Container Registry
-  #       if: ${{ github.ref == 'refs/heads/main' }}
-  #       uses: docker/login-action@v2
-  #       with:
-  #         registry: ghcr.io
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-
-  #     - name: Push Image
-  #       if: ${{ github.ref == 'refs/heads/main' }}
-  #       run: docker push --all-tags ghcr.io/iksaku/laravel-alpine
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ matrix.php }}
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+      
+      - name: '[Debug] List image tags'
+        run: docker image ls ghcr.io/iksaku/laravel-alpine
