@@ -27,7 +27,7 @@ jobs:
 
       - name: Get PHP Release Version
         id: php_release
-        run: echo "::set-output name=version::$(docker run --rm --platform linux/${{ matrix.platfrom }} php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')"
+        run: echo "::set-output name=version::$(docker run --rm --platform linux/${{ matrix.platform }} php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')"
 
       - name: Generate Image Metadata
         id: meta
@@ -80,7 +80,7 @@ jobs:
       
       - name: Get PHP Release Version
         id: php_release
-        run: echo "::set-output name=version::$(docker run --rm --platform linux/${{ matrix.platfrom }} ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')"
+        run: echo "::set-output name=version::$(docker run --rm --platform linux/${{ matrix.platform }} ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')"
 
       - name: Generate Image Metadata
         id: meta
