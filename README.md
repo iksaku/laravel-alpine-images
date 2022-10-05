@@ -115,7 +115,8 @@ The following script can be a good starting point for most projects:
 FROM ghcr.io/iksaku/laravel-alpine:8.1
 
 # Install Laravel Scheduler into Crontab
-COPY shared/crontab /usr/local/etc/crontab
+# You can always replace the default crontab entry by copying your
+# own crontab file in container's /usr/local/etc/crontab
 RUN /usr/bin/crontab /usr/local/etc/crontab
 
 # Copy our project files into the container

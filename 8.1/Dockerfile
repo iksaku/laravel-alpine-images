@@ -39,6 +39,8 @@ COPY shared/php.ini /usr/local/etc/php/conf.d/php.ini
 COPY shared/supervisord.conf /usr/local/etc/supervisor/conf.d/supervisord.conf
 RUN mkdir -p /var/log/supervisor/
 
+COPY shared/crontab /usr/local/etc/crontab
+
 RUN useradd -ms /bin/sh -u 1337 -U laravel
 
 EXPOSE 8080
