@@ -12,15 +12,12 @@ on:
 
 jobs:
   build:
-    name: 'linux/${{ matrix.platform }} php-${{ matrix.php }}'
+    name: php-${{ matrix.php }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         php:
           - 8.1
-        platform:
-          - amd64
-          - arm64
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -56,12 +53,12 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ${{ matrix.php }}
-          platforms: linux/${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
 
   build_octane:
-    name: linux/${{ matrix.platform }} php-${{ matrix.php }} octane-${{ matrix.runtime }}
+    name: php-${{ matrix.php }} octane-${{ matrix.runtime }}
     runs-on: ubuntu-latest
     needs: build
     strategy:
@@ -80,7 +77,7 @@ jobs:
       
       - name: Get PHP Release Version
         id: php_release
-        run: echo "::set-output name=version::$(docker run --rm --platform linux/${{ matrix.platform }} ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')"
+        run: echo "::set-output name=version::$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} /bin/sh php -r 'echo PHP_RELEASE_VERSION;')"
 
       - name: Generate Image Metadata
         id: meta
@@ -110,6 +107,6 @@ jobs:
         with:
           context: ${{ matrix.php }}
           file: ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }}
-          platforms: linux/${{ matrix.platform }}
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
