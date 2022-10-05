@@ -1,18 +1,21 @@
 #!/usr/bin/env sh
 
+if [ ! -z "$LARAVEL_SAIL" ] && [ "$LARAVEL_SAIL" = '1' ]; then
+    if ! id 'sail' &>/dev/null; then
+        useradd -MNo -g laravel -u $(id -u laravel) sail
+    fi
+    
+    if [ ! -z "$WWWUSER" ]; then
+        usermod -ou $WWWUSER sail
+    fi
+fi
+
 if [ ! -z "$WWWUSER" ]; then
-    usermod -u $WWWUSER laravel;
+    usermod -ou $WWWUSER laravel &>/dev/null
 fi
 
 if [ ! -z "$WWWGROUP" ]; then
-    groupmod -g $WWWGROUP laravel;
-fi
-
-if [ ! -z "$LARAVEL_SAIL" ] \
-    && [ "$LARAVEL_SAIL" = '1' ] \
-    && ! id 'sail' &>/dev/null
-then
-    useradd -G laravel sail
+    groupmod -og $WWWGROUP laravel &>/dev/null
 fi
 
 if [ ! -d /.composer ]; then
