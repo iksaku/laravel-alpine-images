@@ -65,9 +65,6 @@ jobs:
       matrix:
         php:
           - 8.1
-        platform:
-          - amd64
-          - arm64
         runtime:
           - roadrunner
           - swoole
