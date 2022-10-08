@@ -6,7 +6,7 @@ if [ ! -z "$LARAVEL_SAIL" ] && [ "$LARAVEL_SAIL" = '1' ]; then
     fi
     
     if [ ! -z "$WWWUSER" ]; then
-        usermod -ou $WWWUSER sail
+        usermod -ou $WWWUSER sail &>/dev/null
     fi
 fi
 
@@ -25,7 +25,7 @@ fi
 chmod -R ugo+rw /.composer
 
 if [ $# -gt 0 ]; then
-    exec su-exec $WWWUSER "$@"
+    exec su-exec ${WWWUSER:-laravel} "$@"
 else
-    /usr/bin/supervisord -c /usr/local/etc/supervisor/conf.d/supervisord.conf
+    exec su-exec laravel /usr/local/bin/start-server
 fi

@@ -8,13 +8,10 @@ RUN chmod +x /usr/local/bin/install-php-extensions
 
 # Install system dependencies
 RUN set -eux \
-    && apk --update add --no-cache \
-        git \
+    && apk --update add --no-cache --purge \
         # Required to serve our Laravel application
-        supervisor \
         libcap \
-        # Required for Laravel scheduler crontab entry
-        su-exec \
+        su-exec \ 
         # Compatibility layer for user and group commands
         shadow \
 
@@ -22,22 +19,16 @@ RUN set -eux \
     && install-php-extensions \
         @composer \
         bcmath \
-
-    # Clean up
-    && rm -rf \
-        /var/lib/apt/lists/* \
-        /tmp/* \
-        /var/tmp/*
+        mysqli pdo_mysql \
+        pgsql pdo_pgsql
 
 RUN setcap "cap_net_bind_service=+ep" /usr/local/bin/php
 
-COPY shared/start-container.sh /usr/local/bin/start-container
-RUN chmod +x /usr/local/bin/start-container
+COPY shared/entrypoint.sh /usr/local/bin/entrypoint
+COPY shared/start-server.sh /usr/local/bin/start-server
+RUN chmod +x /usr/local/bin/entrypoint /usr/local/bin/start-server
 
 COPY shared/php.ini /usr/local/etc/php/conf.d/php.ini
-
-COPY shared/supervisord.conf /usr/local/etc/supervisor/conf.d/supervisord.conf
-RUN mkdir -p /var/log/supervisor/
 
 COPY shared/crontab /usr/local/etc/crontab
 
@@ -45,4 +36,4 @@ RUN useradd -ms /bin/sh -u 1337 -U laravel
 
 EXPOSE 8080
 
-ENTRYPOINT ["start-container"]
+ENTRYPOINT ["entrypoint"]

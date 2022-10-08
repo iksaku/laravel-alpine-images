@@ -26,6 +26,57 @@ either `roadrunner` or `swoole`. Example:
 Checkout the available image tag list
 [here](https://github.com/iksaku/laravel-alpine-images/pkgs/container/laravel-alpine/versions?filters%5Bversion_type%5D=tagged).
 
+### Available PHP extensions
+
+Pre-installed PHP extensions in these images follow [Laravel's Requirements](https://laravel.com/docs/deployment#server-requirements)
+and also include a few extras for Database and Octane support:
+
+| Name           | Availability             |
+| -------------- | ------------------------ |
+| bcmath         | ✓                        |
+| ctype          | ✓                        |
+| curl           | ✓                        |
+| dom            | ✓                        |
+| fileinfo       | ✓                        |
+| json           | ✓                        |
+| mbstring       | ✓                        |
+| mysqli         | ✓                        |
+| openssl        | ✓                        |
+| pcre           | ✓                        |
+| pdo            | ✓                        |
+| pdo_mysql      | ✓                        |
+| pdo_pgsql      | ✓                        |
+| pdo_sqlite     | ✓                        |
+| pgsql          | ✓                        |
+| sqlite3        | ✓                        |
+| tokenizer      | ✓                        |
+| xml            | ✓                        |
+| composer       | ✓                        |
+| pcntl          | Octane-only              |
+| sockets        | Octane-only (RoadRunner) |
+| swoole         | Octane-only (Swoole)     |
+
+> **Note**
+> You can always view the list of installed extenions from your terminal:
+> `docker run --rm ghcr.io/iksaku/laravel-alpine:8.1 php -m`
+
+### Installing aditional PHP extensions
+
+Our images come with [mlocati's `install-php-extension`](https://github.com/mlocati/docker-php-extension-installer)
+binary available, so you can install additional PHP extensions that you may need:
+
+```dockerfile
+FROM ghcr.io/iksaku/laravel-alpine:8.1
+
+RUN install-php-extension \
+    ffi \
+    vips \
+    redis \
+    yaml
+```
+
+You can see all available extensions at [`install-php-extension`'s repo](https://github.com/mlocati/docker-php-extension-installer#supported-php-extensions).
+
 ## Running on Laravel Sail
 
 As opposed to [Laravel Sail](https://laravel.com/docs/sail), you don't need to import
@@ -80,6 +131,7 @@ services:
 ### Running modified images
 If you want to further customize your image, then work with the `build` option in your
 `docker-compose.yml` file:
+
 ```sh
 super-duper-project
 ├── app
@@ -136,7 +188,7 @@ RUN mkdir -p storage/logs \
 RUN sed -i 's/protected \$proxies/protected \$proxies = "*"/g' app/Http/Middleware/TrustProxies.php
 ```
 
-# Credits
+## Credits
 
 As this intends to be an alternative version of Laravel Sail images, most of the credit
 goes to the [@laravel](https://laravel.com/team) team itself for building and

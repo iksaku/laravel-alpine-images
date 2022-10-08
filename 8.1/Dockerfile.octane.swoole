@@ -3,7 +3,7 @@ FROM ghcr.io/iksaku/laravel-alpine:8.1
 # Override supervisord to use Octane
 RUN sed -i \
     's/artisan serve/artisan octane:start --server=swoole/' \
-    /usr/local/etc/supervisor/conf.d/supervisord.conf
+    /usr/local/bin/start-server
 
 # Install PHP extensions required by Octane
 RUN install-php-extensions pcntl swoole
