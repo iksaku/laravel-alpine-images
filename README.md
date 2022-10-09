@@ -48,6 +48,7 @@ and also include a few extras for Database and Octane support:
 | pdo_pgsql      | ✓                        |
 | pdo_sqlite     | ✓                        |
 | pgsql          | ✓                        |
+| redis          | ✓                        |
 | sqlite3        | ✓                        |
 | tokenizer      | ✓                        |
 | xml            | ✓                        |
@@ -71,7 +72,6 @@ FROM ghcr.io/iksaku/laravel-alpine:8.1
 RUN install-php-extension \
     ffi \
     vips \
-    redis \
     yaml
 ```
 

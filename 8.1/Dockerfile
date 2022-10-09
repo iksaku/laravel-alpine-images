@@ -20,7 +20,8 @@ RUN set -eux \
         @composer \
         bcmath \
         mysqli pdo_mysql \
-        pgsql pdo_pgsql
+        pgsql pdo_pgsql \
+        redis
 
 RUN setcap "cap_net_bind_service=+ep" /usr/local/bin/php
 
