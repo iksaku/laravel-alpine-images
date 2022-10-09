@@ -197,7 +197,7 @@ run the following commands:
 
 It is easy to add such commands to a before/after deploy hook on most cases, but
 when deploying to [Fly.io](https://fly.io/), it is rather troublesome, as you can't
-execute this tags in your `Dockerfile`, as it has no access to envrionment variables
+execute these commands in your `Dockerfile`, as it has no access to envrionment variables
 during build.
 
 One of the many ways you can call these commands is by creating a `on_deploy.sh` script
