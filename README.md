@@ -196,7 +196,7 @@ run the following commands:
   * `php artisan migrate --force`
 
 It is easy to add such commands to a before/after deploy hook on most cases, but
-when deploying to [Fly.io](https://fly.io/), it is rather troublesome, as you can't
+when deploying to [Fly.io](https://fly.io/) it is rather troublesome that you can't
 execute these commands in your `Dockerfile`, as it has no access to envrionment variables
 during build.
 
@@ -226,11 +226,11 @@ php artisan migrate --force
 ```
 
 According to Fly's documentation, the process spawned by this command will have access
-to your app's production environment in Fly.
+to your app's production environment in Fly, which is exactly what we need 👌.
 
 > **Note**
-> This command will be managed by the image's default entrypoint, which will
-> set your script execution to be done by the `laravel` user, which is the
+> This command will be managed by the image's default entrypoint, making
+> your script execution to be done by the `laravel` user, which is the
 > default one configured with all app permissions in your container.
 
 ## Credits
