@@ -188,6 +188,51 @@ RUN mkdir -p storage/logs \
 RUN sed -i 's/protected \$proxies/protected \$proxies = "*"/g' app/Http/Middleware/TrustProxies.php
 ```
 
+### Deploying to Fly.io
+
+It is recommended that when you deploy your code to a production environment you
+run the following commands:
+  * `php artisan optimize`
+  * `php artisan migrate --force`
+
+It is easy to add such commands to a before/after deploy hook on most cases, but
+when deploying to [Fly.io](https://fly.io/), it is rather troublesome, as you can't
+execute this tags in your `Dockerfile`, as it has no access to envrionment variables
+during build.
+
+One of the many ways you can call these commands is by creating a `on_deploy.sh` script
+on your app's root directory, and then calling this script from your `fly.toml` file
+using the [`deploy.release_command`](https://fly.io/docs/reference/configuration/#run-one-off-commands-before-releasing-a-deployment)
+property:
+
+```sh
+#!/usr/bin/env sh
+# on_deploy.sh
+
+php artisan optimize
+php artisan migrate --force
+```
+
+```toml
+# fly.toml
+
+[env]
+#  ...
+
+[deploy]
+  release_command = "sh ./on_deploy.sh"
+
+# ...
+```
+
+According to Fly's documentation, the process spawned by this command will have access
+to your app's production environment in Fly.
+
+> **Note**
+> This command will be managed by the image's default entrypoint, which will
+> set your script execution to be done by the `laravel` user, which is the
+> default one configured with all app permissions in your container.
+
 ## Credits
 
 As this intends to be an alternative version of Laravel Sail images, most of the credit
