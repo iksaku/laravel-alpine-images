@@ -1,6 +1,7 @@
-FROM ghcr.io/iksaku/laravel-alpine:8.1
+ARG PHP_VERSION
+FROM ghcr.io/iksaku/laravel-alpine:${PHP_VERSION}
 
-# Override supervisord to use Octane
+# Overwrite entrypoint to use Octane
 RUN sed -i \
     's/artisan serve/artisan octane:start --server=roadrunner --rpc-port=6001/' \
     /usr/local/bin/start-server

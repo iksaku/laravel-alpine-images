@@ -22,6 +22,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Get Docker Context
+        id: docker_context
+        run: echo "::set-output name=context::$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1/x\')"
+
       - name: Get PHP Release Version
         id: php_release
         run: echo "::set-output name=version::$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')"
@@ -52,7 +56,9 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ${{ matrix.php }}
+          context: ${{ steps.docker_context.outputs.context }}
+          build-args: |
+            PHP_VERSION=${{ matrix.php }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -71,6 +77,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+      
+      - name: Get Docker Context
+        id: docker_context
+        run: echo "::set-output name=context::$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1/x\')"
       
       - name: Get PHP Release Version
         id: php_release
@@ -102,8 +112,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ${{ matrix.php }}
+          context: ${{ steps.docker_context.outputs.context }}
           file: ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }}
+          build-args: |
+            PHP_VERSION=${{ matrix.php }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}

@@ -1,12 +1,9 @@
 FROM ghcr.io/iksaku/laravel-alpine:8.1
 
-# Override supervisord to use Octane
+# Overwrite entrypoint to use Octane
 RUN sed -i \
     's/artisan serve/artisan octane:start --server=swoole/' \
     /usr/local/bin/start-server
 
 # Install PHP extensions required by Octane
 RUN install-php-extensions pcntl swoole
-
-# Install RoadRunner binary
-COPY --from=ghcr.io/roadrunner-server/roadrunner:2.11.3 /usr/bin/rr /usr/local/bin/rr
