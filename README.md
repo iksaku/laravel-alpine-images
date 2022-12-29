@@ -16,6 +16,7 @@ You can choose the PHP version you want to run by specifying it as the tag for y
 Currently, we build the following images:
   * `ghcr.io/iksaku/laravel-alpine:8.0`
   * `ghcr.io/iksaku/laravel-alpine:8.1`
+  * `ghcr.io/iksaku/laravel-alpine:8.2`
 
 If you want to run [Laravel Octane](https://laravel.com/docs/octane), you can
 append `-octane-{runtime}` to the PHP version tag, where `{runtime}` could be
