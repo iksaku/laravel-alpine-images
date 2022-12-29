@@ -1,4 +1,5 @@
-FROM php:8.1-cli-alpine as base
+ARG PHP_VERSION
+FROM php:${PHP_VERSION}-cli-alpine as base
 
 WORKDIR /var/www/html
 

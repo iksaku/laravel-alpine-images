@@ -17,14 +17,24 @@ jobs:
     strategy:
       matrix:
         php:
-          - 8.1
+          - '8.0'
+          - '8.1'
+          - '8.2'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Get Docker Context
+        id: docker_context
+        run: echo "context=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_OUTPUT
+
       - name: Get PHP Release Version
         id: php_release
-        run: echo "::set-output name=version::$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')"
+        run: echo "version=$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')" >> $GITHUB_OUTPUT
+      
+      - name: Pull previous Docker Image build
+        continue-on-error: true
+        run: docker pull ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
 
       - name: Generate Image Metadata
         id: meta
@@ -36,11 +46,11 @@ jobs:
             type=raw,${{ matrix.php }}.${{ steps.php_release.outputs.version }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -52,7 +62,9 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ${{ matrix.php }}
+          context: ${{ steps.docker_context.outputs.context }}
+          build-args: |
+            PHP_VERSION=${{ matrix.php }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -64,7 +76,9 @@ jobs:
     strategy:
       matrix:
         php:
-          - 8.1
+          - '8.0'
+          - '8.1'
+          - '8.2'
         runtime:
           - roadrunner
           - swoole
@@ -72,9 +86,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       
+      - name: Get Docker Context
+        id: docker_context
+        run: echo "context=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_OUTPUT
+      
       - name: Get PHP Release Version
         id: php_release
-        run: echo "::set-output name=version::$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} php -r 'echo PHP_RELEASE_VERSION;')"
+        run: echo "version=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} php -r 'echo PHP_RELEASE_VERSION;')" >> $GITHUB_OUTPUT
+      
+      - name: Pull previous Docker Image build
+        continue-on-error: true
+        run: docker pull ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}
 
       - name: Generate Image Metadata
         id: meta
@@ -86,11 +108,11 @@ jobs:
             type=raw,${{ matrix.php }}.${{ steps.php_release.outputs.version }}-octane-${{ matrix.runtime }}
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -102,8 +124,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ${{ matrix.php }}
-          file: ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }}
+          context: ${{ steps.docker_context.outputs.context }}
+          file: ${{ steps.docker_context.outputs.context }}/Dockerfile.octane.${{ matrix.runtime }}
+          build-args: |
+            PHP_VERSION=${{ matrix.php }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
