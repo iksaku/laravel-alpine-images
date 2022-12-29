@@ -1,4 +1,5 @@
-FROM ghcr.io/iksaku/laravel-alpine:8.1
+ARG PHP_VERSION
+FROM ghcr.io/iksaku/laravel-alpine:${PHP_VERSION}
 
 # Overwrite entrypoint to use Octane
 RUN sed -i \

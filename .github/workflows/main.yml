@@ -113,7 +113,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: ${{ steps.docker_context.outputs.context }}
-          file: ${{ matrix.php }}/Dockerfile.octane.${{ matrix.runtime }}
+          file: ${{ steps.docker_context.outputs.context }}/Dockerfile.octane.${{ matrix.runtime }}
           build-args: |
             PHP_VERSION=${{ matrix.php }}
           platforms: linux/amd64,linux/arm64
