@@ -33,6 +33,7 @@ jobs:
         run: echo "version=$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')" >> $GITHUB_OUTPUT
       
       - name: Pull previous Docker Image build
+        continue-on-error: true
         run: docker pull ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
 
       - name: Generate Image Metadata
@@ -94,6 +95,7 @@ jobs:
         run: echo "version=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} php -r 'echo PHP_RELEASE_VERSION;')" >> $GITHUB_OUTPUT
       
       - name: Pull previous Docker Image build
+        continue-on-error: true
         run: docker pull ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }}
 
       - name: Generate Image Metadata
