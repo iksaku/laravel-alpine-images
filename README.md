@@ -181,13 +181,43 @@ RUN composer install --optimize-autoloader --no-dev
 # Make sure our container has the correct permissions
 # to tap into our project storage
 RUN mkdir -p storage/logs \
-    && chown -R laravel:laravel /var/www/html \
     && chmod -R ug+w /var/www/html/storage \
     && chmod -R 755 /var/www/html
 
 # (Optional) Allow requests when running behind a proxy (i.e. fly.io)
 RUN sed -i 's/protected \$proxies/protected \$proxies = "*"/g' app/Http/Middleware/TrustProxies.php
 ```
+
+When deploying your code to different environments, commonly `staging` or `production`, a
+need to execute certan commands or script arises, mostly when dealing with Database migrations, linking storage folders, or performing a general app optimization.
+
+To help out with these tasks, our images support executing scripts inside a `.deploy`
+directory before running the Laravel server.
+To keep things simple, we do not check for a specific list of environments, instead we
+execute deployment scripts when a `RUN_DEPLOY_SCRIPTS` environment variable is available
+and has a value of `1`, otherwise, we simply ignore deployment scripts and jump straight
+into server execution.
+
+> **WARNING**
+> Adding `RUN_DEPLOY_SCRIPTS` variable to your Laravel Sail configuration is not recommended,
+> please avoid using it if you do not intend for them to be run every time you (re)start
+> Laravel Sail.
+
+If you have multiple scripts, you can number them in the order they should be executed:
+
+```
+my-laravel-app/
+├─ .deploy/
+│  ├─ 01_migrate_database.sh
+│  ├─ 02_optimize_application.sh
+├─ app/
+├─ bootstrap/
+├─ ...
+```
+
+> **NOTE**
+> Deploy scripts should be suffixed with the `.sh` extension and will be run using
+> Alpine's `sh` shell as we do not have `bash`.
 
 ### Deploying to Fly.io
 
@@ -201,16 +231,14 @@ when deploying to [Fly.io](https://fly.io/) it is rather troublesome that you ca
 execute these commands in your `Dockerfile`, as it has no access to envrionment variables
 during build.
 
-One of the many ways you can call these commands is by creating a `on_deploy.sh` script
-on your app's root directory, and then calling this script from your `fly.toml` file
-using the [`deploy.release_command`](https://fly.io/docs/reference/configuration/#run-one-off-commands-before-releasing-a-deployment)
+Another way to execute deployment commands when deploying to Fly.io is by creating a
+`on_deploy.sh` script on your app's root directory, and then calling this script from
+your `fly.toml` file using the [`deploy.release_command`](https://fly.io/docs/reference/configuration/#run-one-off-commands-before-releasing-a-deployment)
 property:
 
 ```sh
 #!/usr/bin/env sh
-# on_deploy.sh
 
-php artisan optimize
 php artisan migrate --force
 ```
 
@@ -226,8 +254,14 @@ php artisan migrate --force
 # ...
 ```
 
-According to Fly's documentation, the process spawned by this command will have access
-to your app's production environment in Fly, which is exactly what we need 👌.
+When using this method, Fly will spawn a _temporary_ (or _ephemeral_) virtual machine with
+access to your app's environment to execute this script, and later on, it will destroy such
+VM and queue another VM to take over the given environment. This means that any file-based
+changes done while executing the `release_command` will not be persisted, so only things that
+rely on pinging other services, like Database migrations, will persist.
+
+Use the above mentioned `.deploy` directory if you are planning to execute commands like
+`artisan storage:link` or `artisan optimize`.
 
 > **Note**
 > This command will be managed by the image's default entrypoint, making

@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-if [ ! -z "$LARAVEL_SAIL" ] && [ "$LARAVEL_SAIL" = '1' ]; then
+if [ "$LARAVEL_SAIL" = '1' ]; then
     if ! id 'sail' &>/dev/null; then
         useradd -MNo -g laravel -u $(id -u laravel) sail
     fi
@@ -28,7 +28,7 @@ if [ $# -gt 0 ]; then
     # Execute given command under container's user.
     su-exec laravel "$@"
 else
-    if [ "$APP_ENV" = 'production' ]; then
+    if [ "$LARAVEL_SAIL" != '1' ] && [ "$RUN_DEPLOY_SCRIPTS" = '1' ]; then
         chown -R laravel:laravel $APP_DIRECTORY
 
         if [ -d $APP_DIRECTORY/.deploy ]; then
