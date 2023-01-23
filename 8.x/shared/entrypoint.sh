@@ -33,7 +33,7 @@ else
 
         if [ -d $APP_DIRECTORY/.deploy ]; then
             for SCRIPT in $APP_DIRECTORY/.deploy/*.sh; do
-                su-exec laravel sh ${SCRIPT}
+                su-exec laravel sh $SCRIPT
             done
         fi
     fi
