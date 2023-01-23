@@ -1,19 +1,19 @@
 # Laravel Alpine Docker Images
 
 This project provides Docker images containing the *bare minimum* requirements
-needed to run your Laravel application. We use PHP's official CLI images based
+to run your Laravel application. We use PHP's official CLI images based
 on Alpine Linux to further reduce the size of these images.
 
 You may notice that your favorite PHP extensions and NodeJS are _missing_ from
-these images, but this is actually a _feature_ ✨. The intention with these
+these images, but this is a _feature_ ✨. The intention of these
 images is to provide the *absolute minimum requirements* so that you, the
-developer, pull these images and further customize them with everything
+developer, pull these images, and further customize them with everything
 you need.
 
 ## Available Images
 
 You can choose the PHP version you want to run by specifying it as the tag for your image.
-Currently, we build the following images:
+Currently, we are building the following images:
   * `ghcr.io/iksaku/laravel-alpine:8.0`
   * `ghcr.io/iksaku/laravel-alpine:8.1`
   * `ghcr.io/iksaku/laravel-alpine:8.2`
@@ -59,10 +59,10 @@ and also include a few extras for Database and Octane support:
 | swoole         | Octane-only (Swoole)     |
 
 > **Note**
-> You can always view the list of installed extenions from your terminal:
+> You can always view the list of installed extensions from your terminal:
 > `docker run --rm ghcr.io/iksaku/laravel-alpine:8.1 php -m`
 
-### Installing aditional PHP extensions
+### Installing additional PHP extensions
 
 Our images come with [mlocati's `install-php-extension`](https://github.com/mlocati/docker-php-extension-installer)
 binary available, so you can install additional PHP extensions that you may need:
@@ -82,7 +82,7 @@ You can see all available extensions at [`install-php-extension`'s repo](https:/
 
 As opposed to [Laravel Sail](https://laravel.com/docs/sail), you don't need to import
 this repository as a package nor _publish_ our `Dockerfile` assets most of the time,
-you can just use our images directly in your `docker-compose.yml` file, or use them
+you can use our images directly in your `docker-compose.yml` file or use them
 as a base for your custom `Dockerfile`.
 
 ### About container permissions
@@ -120,7 +120,7 @@ services:
 > using `sail pull` 📥.
 
 ### Running octane images
-Octane images also run in Laravel Sail, you just need to change your `image`
+Octane images also run in Laravel Sail; you need to change your `image`
 reference to specify you want to run octane:
 ```diff
 services:
@@ -130,7 +130,7 @@ services:
 ```
 
 ### Running modified images
-If you want to further customize your image, then work with the `build` option in your
+If you want to customize your image further, then work with the `build` option in your
 `docker-compose.yml` file:
 
 ```sh
@@ -155,8 +155,8 @@ services:
 
 ## Deploying to Production
 
-Published images can also be used in production, but in order to run the best
-in class service, it is 100% recommended that you take a look into customizing
+Published images can also be used in production, but to run the best
+in-class service, it is 100% recommended that you take a look into customizing
 the image to your needs, as well as to make sure that the build process is
 tailored to your needs.
 
@@ -185,18 +185,19 @@ RUN mkdir -p storage/logs \
     && chmod -R ug+w /var/www/html/storage \
     && chmod -R 755 /var/www/html
 
-# (Optional) Allow requests when running behind a proxy (i.e. fly.io)
+# (Optional) Allow requests when running behind a proxy (i.e., fly.io)
 RUN sed -i 's/protected \$proxies/protected \$proxies = "*"/g' app/Http/Middleware/TrustProxies.php
 ```
 
 When deploying your code to different environments, commonly `staging` or `production`, a
-need to execute certan commands or script arises, mostly when dealing with Database migrations, linking storage folders, or performing a general app optimization.
+need to execute specific commands or script arises, mainly when dealing with Database migrations,
+linking storage folders, or performing a general app optimization.
 
 To help out with these tasks, our images support executing scripts inside a `.deploy`
 directory before running the Laravel server.
 To keep things simple, we do not check for a specific list of environments, instead we
 execute deployment scripts when a `RUN_DEPLOY_SCRIPTS` environment variable is available
-and has a value of `1`, otherwise, we simply ignore deployment scripts and jump straight
+and has a value of `1`; otherwise, we ignore deployment scripts and jump straight
 into server execution.
 
 > **NOTE**
@@ -264,7 +265,7 @@ Use the above mentioned `.deploy` directory if you are planning to execute comma
 `artisan storage:link` or `artisan optimize`.
 
 > **Note**
-> This command will be managed by the image's default entrypoint, making
+> The image's default entrypoint will manage this command, making
 > your script execution to be done by the `laravel` user, which is the
 > default one configured with all app permissions in your container.
 
