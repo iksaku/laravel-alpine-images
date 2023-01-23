@@ -14,6 +14,7 @@ jobs:
   build:
     name: php-${{ matrix.php }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       matrix:
         php:
@@ -72,6 +73,7 @@ jobs:
   build_octane:
     name: php-${{ matrix.php }} octane-${{ matrix.runtime }}
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     needs: build
     strategy:
       matrix:
