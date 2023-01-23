@@ -1,6 +1,3 @@
-#syntax=docker/dockerfile:1.4
-# Issue: https://github.com/moby/buildkit/issues/3495
-
 ARG PHP_VERSION
 FROM php:${PHP_VERSION}-cli-alpine as base
 
@@ -20,7 +17,6 @@ RUN set -eux \
         su-exec \ 
         # Compatibility layer for user and group commands
         shadow \
-    #
     # Install missing PHP extensions required by Laravel
     && install-php-extensions \
         @composer \
