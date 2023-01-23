@@ -26,14 +26,18 @@ chmod -R ugo+rw /.composer
 
 if [ $# -gt 0 ]; then
     # Execute given command under container's user.
-    exec su-exec ${WWWUSER:-laravel} "$@"
+    su-exec laravel "$@"
 else
-    if [ "${APP_ENV}" = 'production' ]; then
-        for SCRIPT in ${APP_DIRECTORY}/.deploy/*.sh; do
-            exec su-exec laravel sh ${SCRIPT}
-        done
+    if [ "$APP_ENV" = 'production' ]; then
+        chown -R laravel:laravel $APP_DIRECTORY
+
+        if [ -d $APP_DIRECTORY/.deploy ]; then
+            for SCRIPT in $APP_DIRECTORY/.deploy/*.sh; do
+                su-exec laravel sh ${SCRIPT}
+            done
+        fi
     fi
 
     # If no command is given, execute start script.
-    exec su-exec laravel /usr/local/bin/start-server
+    su-exec laravel /usr/local/bin/start-server
 fi
