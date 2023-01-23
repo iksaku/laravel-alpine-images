@@ -141,7 +141,8 @@ super-duper-project
 ├── docker
 │   └── super-duper-runtime
 │       └── Dockerfile
-└── docker-compose.yml
+├── docker-compose.yml
+│   ...
 ```
 
 ```diff
@@ -198,21 +199,20 @@ execute deployment scripts when a `RUN_DEPLOY_SCRIPTS` environment variable is a
 and has a value of `1`, otherwise, we simply ignore deployment scripts and jump straight
 into server execution.
 
-> **WARNING**
-> Adding `RUN_DEPLOY_SCRIPTS` variable to your Laravel Sail configuration is not recommended,
-> please avoid using it if you do not intend for them to be run every time you (re)start
-> Laravel Sail.
+> **NOTE**
+> `RUN_DEPLOY_SCRIPTS` is ignored when running in Laravel Sail to prevent unintended
+> side effects.
 
 If you have multiple scripts, you can number them in the order they should be executed:
 
 ```
 my-laravel-app/
-├─ .deploy/
-│  ├─ 01_migrate_database.sh
-│  ├─ 02_optimize_application.sh
-├─ app/
-├─ bootstrap/
-├─ ...
+├── .deploy/
+│  ├── 01_migrate_database.sh
+│  ├── 02_optimize_application.sh
+├── app/
+├── bootstrap/
+│   ...
 ```
 
 > **NOTE**
@@ -257,8 +257,8 @@ php artisan migrate --force
 When using this method, Fly will spawn a _temporary_ (or _ephemeral_) virtual machine with
 access to your app's environment to execute this script, and later on, it will destroy such
 VM and queue another VM to take over the given environment. This means that any file-based
-changes done while executing the `release_command` will not be persisted, so only things that
-rely on pinging other services, like Database migrations, will persist.
+changes done while executing the `release_command` will not be persisted, so only procedures
+that ping other services not in the VM, like Database migrations, will persist.
 
 Use the above mentioned `.deploy` directory if you are planning to execute commands like
 `artisan storage:link` or `artisan optimize`.
@@ -275,4 +275,4 @@ goes to the [@laravel](https://laravel.com/team) team itself for building and
 maintaining Laravel Sail for us 💖.
 
 Also, much inspiration (and snippets) come from [@fideloper](https://github.com/fideloper)'s
-public work on Fly.io's Laravel Template 🔮.
+public work on [Fly.io's Laravel Template](https://github.com/superfly/flyctl) 🔮.
