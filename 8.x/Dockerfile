@@ -1,7 +1,9 @@
 ARG PHP_VERSION
 FROM php:${PHP_VERSION}-cli-alpine as base
 
-WORKDIR /var/www/html
+ENV APP_DIRECTORY=/var/www/html
+
+WORKDIR ${APP_DIRECTORY}
 
 # Get php extension installer
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
