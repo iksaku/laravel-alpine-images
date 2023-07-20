@@ -34,7 +34,6 @@ jobs:
           CURRENT_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} php -r 'echo PHP_VERSION;')
           if [ "${{ steps.php.outputs.version }}" == "$CURRENT_VERSION" ]; then
             echo "PHP version is up to date: v${{ steps.php.outputs.version }}"
-            echo "continue=false" >> $GITHUB_OUTPUT
           else
             echo "PHP version is outdated. Got v$CURRENT_VERSION, expected v${{ steps.php.outputs.version }}"
             echo "continue=true" >> $GITHUB_OUTPUT
@@ -120,16 +119,15 @@ jobs:
           echo "version=$LATEST_RUNTIME_VERSION" >> $GITHUB_OUTPUT
 
       - name: Check if Image is up to date
+        id: check
         run: |
-          PHP_OUTDATED=true
-          RUNTIME_OUTDATED=true
-          
           CURRENT_PHP_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }} php -r 'echo PHP_VERSION;')
           if [ "${{ steps.standalone.outputs.version }}" == "$CURRENT_PHP_VERSION" ]; then
             echo "PHP version is up to date: v${{ steps.standalone.outputs.version }}"
-            PHP_OUTDATED=false
           else
             echo "PHP version is outdated. Got v$CURRENT_PHP_VERSION, expected v${{ steps.standalone.outputs.version }}"
+            echo "continue=true" >> $GITHUB_OUTPUT
+            exit 0
           fi
           
           if [ "${{ matrix.runtime }}" == "roadrunner" ]; then
@@ -140,15 +138,10 @@ jobs:
           
           if [ "${{ steps.runtime.outputs.version }}" == "$CURRENT_RUNTIME_VERSION" ]; then
             echo "Runtime version is up to date: v${CURRENT_RUNTIME_RELEASE}"
-            RUNTIME_OUTDATED=false
           else
             echo "Runtime version is outdated. Got v$CURRENT_RUNTIME_VERSION, expected v${{ steps.runtime.outputs.version }}"
-          fi
-          
-          if [ "$PHP_OUTDATED" == true ] || [ "$RUNTIME_OUTDATED" == true ]; then
             echo "continue=true" >> $GITHUB_OUTPUT
-          else
-            echo "continue=false" >> $GITHUB_OUTPUT
+            exit 0
           fi
 
       - name: Checkout Code
