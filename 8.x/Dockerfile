@@ -14,7 +14,7 @@ RUN set -eux \
     && apk --update add --no-cache --purge \
         # Required to serve our Laravel application
         libcap \
-        su-exec \ 
+        su-exec \
         # Compatibility layer for user and group commands
         shadow \
     # Install missing PHP extensions required by Laravel

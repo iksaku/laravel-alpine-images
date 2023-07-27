@@ -40,16 +40,16 @@ jobs:
           fi
 
       - name: Checkout Code
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         uses: actions/checkout@v3
 
       - name: Get Docker Context
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         id: docker_context
         run: echo "context=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_OUTPUT
 
       - name: Generate Image Metadata
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -59,16 +59,16 @@ jobs:
             type=raw,${{ matrix.php }}.${{ steps.php.outputs.release }}
 
       - name: Set up QEMU
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         id: buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -76,7 +76,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         uses: docker/build-push-action@v4
         with:
           context: ${{ steps.docker_context.outputs.context }}
@@ -123,9 +123,9 @@ jobs:
         run: |
           CURRENT_PHP_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }} php -r 'echo PHP_VERSION;')
           if [ "${{ steps.standalone.outputs.version }}" == "$CURRENT_PHP_VERSION" ]; then
-            echo "PHP version is up to date: v${{ steps.standalone.outputs.version }}"
+            echo "PHP version is up to date: ${{ steps.standalone.outputs.version }}"
           else
-            echo "PHP version is outdated. Got v$CURRENT_PHP_VERSION, expected v${{ steps.standalone.outputs.version }}"
+            echo "PHP version is outdated. Got $CURRENT_PHP_VERSION, expected ${{ steps.standalone.outputs.version }}"
             echo "continue=true" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -137,24 +137,24 @@ jobs:
           fi
           
           if [ "${{ steps.runtime.outputs.version }}" == "$CURRENT_RUNTIME_VERSION" ]; then
-            echo "Runtime version is up to date: v${CURRENT_RUNTIME_RELEASE}"
+            echo "Runtime version is up to date: ${CURRENT_RUNTIME_VERSION}"
           else
-            echo "Runtime version is outdated. Got v$CURRENT_RUNTIME_VERSION, expected v${{ steps.runtime.outputs.version }}"
+            echo "Runtime version is outdated. Got $CURRENT_RUNTIME_VERSION, expected ${{ steps.runtime.outputs.version }}"
             echo "continue=true" >> $GITHUB_OUTPUT
             exit 0
           fi
 
       - name: Checkout Code
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         uses: actions/checkout@v3
 
       - name: Get Docker Context
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         id: docker_context
         run: echo "context=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_OUTPUT
 
       - name: Generate Image Metadata
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -165,16 +165,16 @@ jobs:
             type=raw,${{ matrix.php }}.${{ steps.standalone.outputs.release }}-octane-${{ matrix.runtime }}-${{ steps.runtime.outputs.version }}
 
       - name: Set up QEMU
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         id: buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -182,7 +182,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ steps.check.outputs.continue == 'true' }}
+        if: ${{ github.event_name == 'schedule' && steps.check.outputs.continue == 'true' }}
         uses: docker/build-push-action@v4
         with:
           context: ${{ steps.docker_context.outputs.context }}
