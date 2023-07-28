@@ -21,6 +21,7 @@ RUN set -eux \
     && install-php-extensions \
         @composer \
         bcmath \
+        intl \
         mysqli pdo_mysql \
         pgsql pdo_pgsql \
         redis
