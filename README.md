@@ -39,6 +39,7 @@ and also include a few extras for Database and Octane support:
 | curl           | ✓                        |
 | dom            | ✓                        |
 | fileinfo       | ✓                        |
+| intl           | ✓                        |
 | json           | ✓                        |
 | mbstring       | ✓                        |
 | mysqli         | ✓                        |
