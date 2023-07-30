@@ -18,24 +18,16 @@ if [ ! -z "$WWWGROUP" ]; then
     groupmod -og $WWWGROUP laravel &>/dev/null
 fi
 
-if [ ! -d /.composer ]; then
-    mkdir /.composer
-fi
-
-chmod -R ugo+rw /.composer
+chown -R laravel:laravel $APP_DIRECTORY
 
 if [ $# -gt 0 ]; then
     # Execute given command under container's user.
     su-exec laravel "$@"
 else
-    if [ "$LARAVEL_SAIL" != '1' ] && [ "$RUN_DEPLOY_SCRIPTS" = '1' ]; then
-        chown -R laravel:laravel $APP_DIRECTORY
-
-        if [ -d $APP_DIRECTORY/.deploy ]; then
-            for SCRIPT in $APP_DIRECTORY/.deploy/*.sh; do
-                su-exec laravel sh $SCRIPT
-            done
-        fi
+    if [ -d $APP_DIRECTORY/.deploy ] && [ "$LARAVEL_SAIL" != '1' ] && [ "$RUN_DEPLOY_SCRIPTS" = '1' ]; then
+        for SCRIPT in $APP_DIRECTORY/.deploy/*.sh; do
+            su-exec laravel sh $SCRIPT
+        done
     fi
 
     # If no command is given, execute start script.

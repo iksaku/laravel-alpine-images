@@ -34,7 +34,9 @@ RUN chmod +x /usr/local/bin/entrypoint /usr/local/bin/start-server
 
 COPY shared/php.ini /usr/local/etc/php/conf.d/php.ini
 
-COPY shared/crontab /usr/local/etc/crontab
+# Install Laravel Scheduler to crontab.
+# Expected to be run crond as root, then su-exec takes over.
+COPY shared/crontab /var/spool/cron/crontabs/root
 
 RUN useradd -ms /bin/sh -u 1337 -U laravel
 

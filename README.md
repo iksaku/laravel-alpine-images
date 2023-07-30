@@ -169,10 +169,10 @@ The following script can be a good starting point for most projects:
 
 FROM ghcr.io/iksaku/laravel-alpine:8.1
 
-# Install Laravel Scheduler into Crontab
-# You can always replace the default crontab entry by copying your
-# own crontab file in container's /usr/local/etc/crontab
-RUN /usr/bin/crontab /usr/local/etc/crontab
+# Run the installed Laravel Scheduler in the background.
+# You can replace the default entry by copying your own crontab
+# file in container's /var/spool/cron/crontabs/root
+RUN crond
 
 # Copy our project files into the container
 COPY . /var/www/html
@@ -247,7 +247,6 @@ php artisan migrate --force
 ```toml
 # fly.toml
 
-[env]
 #  ...
 
 [deploy]
@@ -269,6 +268,29 @@ Use the above mentioned `.deploy` directory if you are planning to execute comma
 > The image's default entrypoint will manage this command, making
 > your script execution to be done by the `laravel` user, which is the
 > default one configured with all app permissions in your container.
+
+#### Running multiple processes
+Fly's support for [multiple process groups](https://fly.io/docs/apps/processes/) allow to run multiple
+commands (or processes) in separate machines. This is useful when you want also run a queue worker or
+a scheduler:
+
+```toml
+# fly.toml
+
+# ...
+
+[processes]
+  # This is the default process group running our Laravel app
+  app = ""
+  # Run the Laravel scheduler using Alpine's crond in the foreground (for logs)
+  scheduler = "crond -f"
+  # Run the Laravel queue worker
+  worker = "php artisan queue:work"
+```
+
+For more information on how process groups work and how you can scale them, check out:
+* [Run Multiple Process Groups in an App](https://fly.io/docs/apps/processes/).
+* [Scale Process Groups](https://fly.io/docs/apps/scale-count/#scale-by-process-group).
 
 ## Credits
 
