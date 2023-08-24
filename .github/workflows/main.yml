@@ -33,21 +33,21 @@ jobs:
           CURRENT_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} php -r 'echo PHP_VERSION;')
           if [ "${{ env.PHP_VERSION }}" == "$CURRENT_VERSION" ]; then
             echo "PHP version is up to date: v${{ env.PHP_VERSION }}"
-            echo "UP_TO_DATE=true" >> $GITHUB_ENV
           else
             echo "PHP version is outdated. Got v$CURRENT_VERSION, expected v${{ env.PHP_VERSION }}"
+            echo "UP_TO_DATE=false" >> $GITHUB_ENV
           fi
 
       - name: Checkout Code
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: actions/checkout@v3
 
       - name: Get Docker Context
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
 
       - name: Generate Image Metadata
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -57,15 +57,15 @@ jobs:
             type=raw,${{ matrix.php }}.${{ env.PHP_RELEASE_VERSION }}
 
       - name: Set up QEMU
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -73,7 +73,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: docker/build-push-action@v4
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
@@ -119,9 +119,9 @@ jobs:
           CURRENT_PHP_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }} php -r 'echo PHP_VERSION;')
           if [ "${{ env.PHP_VERSION }}" == "$CURRENT_PHP_VERSION" ]; then
             echo "PHP version is up to date: ${{ env.PHP_VERSION }}"
-            echo "UP_TO_DATE=true" >> $GITHUB_ENV
           else
             echo "PHP version is outdated. Got $CURRENT_PHP_VERSION, expected ${{ env.PHP_VERSION }}"
+            echo "UP_TO_DATE=false" >> $GITHUB_ENV
           fi
           
           if [ "${{ matrix.runtime }}" == "roadrunner" ]; then
@@ -132,21 +132,21 @@ jobs:
           
           if [ "${{ env.RUNTIME_VERSION }}" == "$CURRENT_RUNTIME_VERSION" ]; then
             echo "Runtime version is up to date: ${CURRENT_RUNTIME_VERSION}"
-            echo "UP_TO_DATE=true" >> $GITHUB_ENV
           else
             echo "Runtime version is outdated. Got $CURRENT_RUNTIME_VERSION, expected ${{ env.RUNTIME_VERSION }}"
+            echo "UP_TO_DATE=false" >> $GITHUB_ENV
           fi
 
       - name: Checkout Code
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: actions/checkout@v3
 
       - name: Get Docker Context
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
 
       - name: Generate Image Metadata
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         id: meta
         uses: docker/metadata-action@v4
         with:
@@ -157,15 +157,15 @@ jobs:
             type=raw,${{ matrix.php }}.${{ env.PHP_RELEASE_VERSION }}-octane-${{ matrix.runtime }}-${{ env.RUNTIME_VERSION }}
 
       - name: Set up QEMU
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -173,7 +173,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ env.UP_TO_DATE != 'true' }}
+        if: ${{ env.UP_TO_DATE == 'false' }}
         uses: docker/build-push-action@v4
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
