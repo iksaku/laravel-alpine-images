@@ -22,7 +22,7 @@ runs:
     - name: 'Compare Versions'
       id: compare
       shell: bash
-      run: echo "result=$(php -r 'var_export(version_compare("${{ inputs.head }}", "${{ inputs.base }}", '>'));')" >> $GITHUB_OUTPUT
+      run: echo "result=$(php -r 'var_export(version_compare("${{ inputs.head }}", "${{ inputs.base }}", ">"));')" >> $GITHUB_OUTPUT
     - name: 'Output results'
       shell: bash
       run: |
