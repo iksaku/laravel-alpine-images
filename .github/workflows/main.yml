@@ -32,7 +32,6 @@ jobs:
           echo "UPSTREAM_PHP_VERSION=$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_VERSION;')" >> $GITHUB_ENV
 
       - name: Check if Image is up to date
-        if: ${{ github.event_name == 'schedule' }}
         id: up-to-date
         uses: ./.github/actions/version-up-to-date
         with:
