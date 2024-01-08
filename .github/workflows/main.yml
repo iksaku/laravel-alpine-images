@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    name: php-${{ matrix.php }}
+    name: php-${{ matrix.php }}-${{ matrix.variant }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -54,8 +54,8 @@ jobs:
           images: ghcr.io/iksaku/laravel-alpine
           tags: |
             type=raw,enable=${{ matrix.variant == 'cli' }},${{ matrix.php }}
-            type=raw,${{ matrix.php }}-${{ matrix.variant }}
             type=raw,enable=${{ matrix.variant == 'cli' }},${{ env.UPSTREAM_PHP_VERSION }}
+            type=raw,${{ matrix.php }}-${{ matrix.variant }}
             type=raw,${{ env.UPSTREAM_PHP_VERSION }}-${{ matrix.variant }}
 
       - name: Set up QEMU
