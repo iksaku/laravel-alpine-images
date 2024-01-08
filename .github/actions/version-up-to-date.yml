@@ -1,0 +1,31 @@
+name: 'Ensure version is up to date'
+
+inputs:
+  tool-name:
+    description: 'Name of the tool to echo results of'
+    required: true
+  base:
+    description: 'Base (current) version for comparison'
+    required: true
+  head:
+    description: 'Head (newer) version for comparison'
+    required: true
+
+outputs:
+  result:
+    description: 'Whether the provided "Base version" is up to date with "Head version"'
+    value: ${{ steps.compare.outputs.result }}
+
+runs:
+  using: composite
+  steps:
+    - name: 'Compare Versions'
+      id: compare
+      run: echo "result=$(php -r 'var_export(version_compare("${{ inputs.head }}", "${{ inputs.base }}", '>'));')" >> $GITHUB_OUTPUT
+    - name: 'Output results'
+      run: |
+        if [ "${{ steps.compare.outputs.result }}" == "false" ]; then
+          echo "${{ inputs.tool-name }} is up to date (${{ inputs.base }})."
+        else
+          echo "A new version of ${{ inputs.tool-name }} is available (${{ inputs.base }} -> ${{ inputs.head }})."
+        fi
