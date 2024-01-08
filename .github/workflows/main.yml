@@ -22,6 +22,9 @@ jobs:
           - '8.1'
           - '8.2'
           - '8.3'
+        variant:
+          - cli
+          - zts
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -29,7 +32,7 @@ jobs:
       - name: Get PHP Versions
         run: |
           echo "CURRENT_PHP_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} php -r 'echo PHP_VERSION;')" >> $GITHUB_ENV
-          echo "UPSTREAM_PHP_VERSION=$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_VERSION;')" >> $GITHUB_ENV
+          echo "UPSTREAM_PHP_VERSION=$(docker run --rm php:${{ matrix.php }}-${{ matrix.variant }}-alpine php -r 'echo PHP_VERSION;')" >> $GITHUB_ENV
 
       - name: Check if Image is up to date
         id: up-to-date
@@ -50,8 +53,10 @@ jobs:
         with:
           images: ghcr.io/iksaku/laravel-alpine
           tags: |
-            type=raw,${{ matrix.php }}
-            type=raw,${{ env.UPSTREAM_PHP_VERSION }}
+            type=raw,enable=${{ matrix.variant == 'cli' }},${{ matrix.php }}
+            type=raw,${{ matrix.php }}-${{ matrix.variant }}
+            type=raw,enable=${{ matrix.variant == 'cli' }},${{ env.UPSTREAM_PHP_VERSION }}
+            type=raw,${{ env.UPSTREAM_PHP_VERSION }}-${{ matrix.variant }}
 
       - name: Set up QEMU
         if: ${{ github.event_name != 'schedule' || steps.up-to-date.outputs.result == 'false' }}
@@ -76,6 +81,7 @@ jobs:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
           build-args: |
             PHP_VERSION=${{ matrix.php }}
+            VARIANT=${{ matrix.variant }}
           platforms: linux/amd64,linux/arm64
           push: ${{ contains(fromJSON('["push", "schedule"]'), github.event_name) && github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}

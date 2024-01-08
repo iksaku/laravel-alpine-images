@@ -1,7 +1,7 @@
 # Laravel Alpine Docker Images
 
 This project provides Docker images containing the *bare minimum* requirements
-to run your Laravel application. We use PHP's official CLI images based
+to run your Laravel application. We use PHP's official CLI/ZTS images based
 on Alpine Linux to further reduce the size of these images.
 
 You may notice that your favorite PHP extensions and NodeJS are _missing_ from

@@ -1,5 +1,6 @@
 ARG PHP_VERSION
-FROM php:${PHP_VERSION}-cli-alpine as base
+ARG VARIANT
+FROM php:${PHP_VERSION}-${VARIANT}-alpine as base
 
 ENV APP_DIRECTORY=/var/www/html
 
