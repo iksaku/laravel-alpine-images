@@ -33,7 +33,7 @@ jobs:
 
       - name: Check if Image is up to date
         id: up-to-date
-        uses: ./.github/actions/version-up-to-date
+        uses: ./.github/actions/version-up-to-date.yml
         with:
           tool-name: PHP
           base: ${{ env.CURRENT_PHP_VERSION }}
