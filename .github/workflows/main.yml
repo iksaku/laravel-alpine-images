@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check if PHP version is up to date
-        id: runtime
+        id: php
         uses: ./.github/actions/runtime-version-compare
         with:
           runtime-name: PHP ${{ matrix.php }} (${{ matrix.variant }})
