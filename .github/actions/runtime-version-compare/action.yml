@@ -47,4 +47,4 @@ runs:
       with:
         tool-name: ${{ inputs.runtime-name }}
         base: ${{ steps.base-version.outputs.version }}
-        upstream: ${{ steps.upstream-version.outputs.version }}
+        head: ${{ steps.upstream-version.outputs.version }}
