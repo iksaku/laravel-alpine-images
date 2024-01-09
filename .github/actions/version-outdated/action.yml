@@ -1,0 +1,42 @@
+name: 'Check if version is outdated'
+
+inputs:
+  tool-name:
+    description: 'Name of the tool to echo results of'
+    required: true
+  base:
+    description: 'Base (current) version for comparison'
+    required: true
+  head:
+    description: 'Head (newer) version for comparison'
+    required: true
+
+outputs:
+  outdated:
+    description: |
+      Whether the provided "Base version" is up to date with "Head version".
+      If "Head version" is empty, then we will mark "outdated" as "true".
+    value: ${{ steps.compare.outputs.outdated }}
+
+runs:
+  using: composite
+  steps:
+    - name: 'Compare Versions'
+      id: compare
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.head }}" ]; then
+          echo "outdated=true"
+        else
+          echo "outdated=$(php -r 'var_export(version_compare("${{ inputs.head }}", "${{ inputs.base }}", ">"));')" >> $GITHUB_OUTPUT
+        fi
+    - name: 'Output results'
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.head }}" ]; then
+          echo "${{ inputs.tool-name }} appears to be new! (No previous version available)."
+        elif [ "${{ steps.compare.outputs.outdated }}" == "true"]; then
+          echo "A new version of ${{ inputs.tool-name }} is available (${{ inputs.base }} -> ${{ inputs.head }})."
+        else
+          echo "${{ inputs.tool-name }} is up to date (${{ inputs.base }})."
+        fi
