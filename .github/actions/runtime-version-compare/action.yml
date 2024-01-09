@@ -21,10 +21,7 @@ outputs:
   version:
     description: |
       Most up to date runtime version.
-
       If upstream-version results in a falsy (empty) value, use the base-version instead.
-      Version compare will always indicate that base-version is outdated in this case,
-      meaning upstream-image may not exist, but there's always a first time.
     value: ${{ steps.upstream-version.outputs.version || steps.base-version.outputs.version }}
 
 runs:

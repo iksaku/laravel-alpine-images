@@ -15,7 +15,7 @@ outputs:
   outdated:
     description: |
       Whether the provided "Base version" is up to date with "Head version".
-      If "Head version" is empty, then we will mark "outdated" as "true".
+      If "Base version" or "Head version" is empty, then we will mark "outdated" as "true".
     value: ${{ steps.compare.outputs.outdated }}
 
 runs:
@@ -25,7 +25,7 @@ runs:
       id: compare
       shell: bash
       run: |
-        if [ -z "${{ inputs.head }}" ]; then
+        if [ -z "${{ inputs.base }}" ] || [ -z "${{ inputs.head }}" ]; then
           echo "outdated=true"
         else
           echo "outdated=$(php -r 'var_export(version_compare("${{ inputs.head }}", "${{ inputs.base }}", ">"));')" >> $GITHUB_OUTPUT
@@ -33,8 +33,8 @@ runs:
     - name: 'Output results'
       shell: bash
       run: |
-        if [ -z "${{ inputs.head }}" ]; then
-          echo "${{ inputs.tool-name }} appears to be new! (No previous version available)."
+        if [ -z "${{ inputs.base }}" ] || [ -z "${{ inputs.head }}" ]; then
+          echo "${{ inputs.tool-name }} appears to be new!."
         elif [ "${{ steps.compare.outputs.outdated }}" == "true"]; then
           echo "A new version of ${{ inputs.tool-name }} is available (${{ inputs.base }} -> ${{ inputs.head }})."
         else
