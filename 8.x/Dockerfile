@@ -23,6 +23,7 @@ RUN set -eux \
         @composer \
         bcmath \
         intl \
+        pcntl \
         mysqli pdo_mysql \
         pgsql pdo_pgsql \
         redis

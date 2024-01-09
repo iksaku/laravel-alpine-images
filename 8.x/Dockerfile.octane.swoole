@@ -7,4 +7,4 @@ RUN sed -i \
     /usr/local/bin/start-server
 
 # Install PHP extensions required by Octane
-RUN install-php-extensions pcntl swoole
+RUN install-php-extensions swoole

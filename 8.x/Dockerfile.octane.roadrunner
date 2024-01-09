@@ -7,7 +7,7 @@ RUN sed -i \
     /usr/local/bin/start-server
 
 # Install PHP extensions required by Octane
-RUN install-php-extensions pcntl sockets
+RUN install-php-extensions sockets
 
 # Install RoadRunner binary
 COPY --from=ghcr.io/roadrunner-server/roadrunner:latest /usr/bin/rr /usr/local/bin/rr
