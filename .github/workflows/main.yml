@@ -76,7 +76,7 @@ jobs:
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
           build-args: |
-            PHP_VERSION=${{ steps.php.outputs.version }}
+            PHP_VERSION=${{ matrix.php }}
             VARIANT=${{ matrix.variant }}
           platforms: linux/amd64,linux/arm64
           push: ${{ contains(fromJSON('["push", "schedule"]'), github.event_name) && github.ref == 'refs/heads/main' }}
@@ -153,6 +153,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
+          file: ${{ env.DOCKER_BUILD_CONTEXT }}/Dockerfile.octane.roadrunner
           build-args: |
             PHP_VERSION=${{ matrix.php }}
           platforms: linux/amd64,linux/arm64
