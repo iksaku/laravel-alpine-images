@@ -43,7 +43,6 @@ runs:
     - name: 'Compare runtime versions'
       if: ${{ !cancelled() }}
       id: compare
-      shell: bash
       uses: ./.github/actions/version-outdated
       with:
         tool-name: ${{ inputs.runtime-name }}
