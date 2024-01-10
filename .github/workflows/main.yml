@@ -2,6 +2,8 @@ name: Image Builder
 
 on:
   push:
+    branches:
+      - main
     paths-ignore:
       - '**.md'
   pull_request:
@@ -12,7 +14,7 @@ on:
 
 jobs:
   build:
-    name: php-${{ matrix.php }}
+    name: php-${{ matrix.php }}-${{ matrix.variant }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -21,70 +23,146 @@ jobs:
           - '8.0'
           - '8.1'
           - '8.2'
+          - '8.3'
+        variant:
+          - cli
+          - zts
     steps:
-      - name: Get Latest PHP Version
-        run: |
-          echo "PHP_VERSION=$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_VERSION;')" >> $GITHUB_ENV
-          echo "PHP_RELEASE_VERSION=$(docker run --rm php:${{ matrix.php }}-cli-alpine php -r 'echo PHP_RELEASE_VERSION;')" >> $GITHUB_ENV
-
-      - name: Check if Image is up to date
-        if: ${{ github.event_name == 'schedule' }}
-        run: |
-          CURRENT_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} php -r 'echo PHP_VERSION;')
-          if [ "${{ env.PHP_VERSION }}" == "$CURRENT_VERSION" ]; then
-            echo "PHP version is up to date: v${{ env.PHP_VERSION }}"
-          else
-            echo "PHP version is outdated. Got v$CURRENT_VERSION, expected v${{ env.PHP_VERSION }}"
-            echo "UP_TO_DATE=false" >> $GITHUB_ENV
-          fi
-
       - name: Checkout Code
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Check if PHP version is up to date
+        id: php
+        uses: ./.github/actions/runtime-version-compare
+        with:
+          runtime-name: PHP ${{ matrix.php }} (${{ matrix.variant }})
+          base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-${{ matrix.variant }}
+          upstream-image: php:${{ matrix.php }}-${{ matrix.variant }}-alpine
+          version-command: php -r 'echo PHP_VERSION;'
 
       - name: Get Docker Context
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
         run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
 
       - name: Generate Image Metadata
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ghcr.io/iksaku/laravel-alpine
           tags: |
-            type=raw,${{ matrix.php }}
-            type=raw,${{ matrix.php }}.${{ env.PHP_RELEASE_VERSION }}
+            type=raw,enable=${{ matrix.variant == 'cli' }},${{ matrix.php }}
+            type=raw,enable=${{ matrix.variant == 'cli' }},${{ steps.php.outputs.version }}
+            type=raw,${{ matrix.php }}-${{ matrix.variant }}
+            type=raw,${{ steps.php.outputs.version }}-${{ matrix.variant }}
 
       - name: Set up QEMU
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: docker/setup-qemu-action@v2
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: docker/setup-buildx-action@v2
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: docker/login-action@v2
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: docker/build-push-action@v4
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
+        uses: docker/build-push-action@v5
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
           build-args: |
             PHP_VERSION=${{ matrix.php }}
+            VARIANT=${{ matrix.variant }}
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ contains(fromJSON('["push", "schedule"]'), github.event_name) && github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
 
-  build_octane:
-    name: php-${{ matrix.php }} octane-${{ matrix.runtime }}
+  build-octane-roadrunner:
+    name: php-${{ matrix.php }},octane-roadrunner
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: build
+    strategy:
+      matrix:
+        php:
+          - '8.0'
+          - '8.1'
+          - '8.2'
+          - '8.3'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Check if PHP version is up to date
+        id: php
+        uses: ./.github/actions/runtime-version-compare
+        with:
+          runtime-name: PHP ${{ matrix.php }}
+          base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-roadrunner
+          upstream-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
+          version-command: php -r 'echo PHP_VERSION;'
+      - name: Check if RoadRunner version is up to date
+        id: roadrunner
+        uses: ./.github/actions/runtime-version-compare
+        with:
+          runtime-name: RoadRunner
+          base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-roadrunner rr
+          upstream-image: ghcr.io/roadrunner-server/roadrunner:latest
+          version-command: -v | sed -r 's/^rr version ([0-9\.]+) .*/\1/'
+
+      - name: Get Docker Context
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
+
+      - name: Generate Image Metadata
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/iksaku/laravel-alpine
+          tags:
+            type=raw,${{ matrix.php }}-octane-roadrunner
+            type=raw,${{ matrix.php }}-octane-roadrunner-${{ steps.roadrunner.outputs.version }}
+            type=raw,${{ steps.php.outputs.version }}-octane-roadrunner
+            type=raw,${{ steps.php.outputs.version }}-octane-roadrunner-${{ steps.roadrunner.outputs.version }}
+
+      - name: Set up QEMU
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.DOCKER_BUILD_CONTEXT }}
+          file: ${{ env.DOCKER_BUILD_CONTEXT }}/Dockerfile.octane.roadrunner
+          build-args: |
+            PHP_VERSION=${{ matrix.php }}
+          platforms: linux/amd64,linux/arm64
+          push: ${{ contains(fromJSON('["push", "schedule"]'), github.event_name) && github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+
+  build-octane-swoole:
+    name: php-${{ matrix.php }},octane-swoole
     runs-on: ubuntu-latest
     timeout-minutes: 40
     needs: build
@@ -94,92 +172,68 @@ jobs:
           - '8.0'
           - '8.1'
           - '8.2'
-        runtime:
-          - roadrunner
-          - swoole
+          - '8.3'
     steps:
-      - name: Get Latest (Non-Octane Image) PHP version
-        run: |
-          echo "PHP_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} php -r 'echo PHP_VERSION;')" >> $GITHUB_ENV
-          echo "PHP_RELEASE_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }} php -r 'echo PHP_RELEASE_VERSION;')" >> $GITHUB_ENV
-
-      - name: Get Latest ${{ matrix.runtime }} version
-        run: |
-          if [ "${{ matrix.runtime }}" == "roadrunner" ]; then
-            LATEST_RUNTIME_VERSION=$(docker run --rm ghcr.io/roadrunner-server/roadrunner:latest -v | sed -r 's/^rr version ([0-9\.]+) .*/\1/')
-          elif [ "${{ matrix.runtime }}" == "swoole" ]; then
-            LATEST_RUNTIME_VERSION=$(docker run --rm phpswoole/swoole:5.0-php${{ matrix.php }}-alpine php -r 'echo swoole_version();')
-          fi
-          
-          echo "RUNTIME_VERSION=$LATEST_RUNTIME_VERSION" >> $GITHUB_ENV
-
-      - name: Check if Image is up to date
-        if: ${{ github.event_name == 'schedule' }}
-        run: |
-          CURRENT_PHP_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }} php -r 'echo PHP_VERSION;')
-          if [ "${{ env.PHP_VERSION }}" == "$CURRENT_PHP_VERSION" ]; then
-            echo "PHP version is up to date: ${{ env.PHP_VERSION }}"
-          else
-            echo "PHP version is outdated. Got $CURRENT_PHP_VERSION, expected ${{ env.PHP_VERSION }}"
-            echo "UP_TO_DATE=false" >> $GITHUB_ENV
-          fi
-          
-          if [ "${{ matrix.runtime }}" == "roadrunner" ]; then
-            CURRENT_RUNTIME_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }} rr -v | sed -r 's/^rr version ([0-9\.]+) .*/\1/')
-          elif [ "${{ matrix.runtime }}" == "swoole" ]; then
-            CURRENT_RUNTIME_VERSION=$(docker run --rm ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-${{ matrix.runtime }} php -r 'echo swoole_version();')
-          fi
-          
-          if [ "${{ env.RUNTIME_VERSION }}" == "$CURRENT_RUNTIME_VERSION" ]; then
-            echo "Runtime version is up to date: ${CURRENT_RUNTIME_VERSION}"
-          else
-            echo "Runtime version is outdated. Got $CURRENT_RUNTIME_VERSION, expected ${{ env.RUNTIME_VERSION }}"
-            echo "UP_TO_DATE=false" >> $GITHUB_ENV
-          fi
-
       - name: Checkout Code
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Check if PHP version is up to date
+        id: php
+        uses: ./.github/actions/runtime-version-compare
+        with:
+          runtime-name: PHP ${{ matrix.php }}
+          base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-swoole
+          upstream-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
+          version-command: php -r 'echo PHP_VERSION;'
+      - name: Check if Swoole version is up to date
+        id: swoole
+        uses: ./.github/actions/runtime-version-compare
+        with:
+          runtime-name: Octane Swoole
+          base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-swoole
+          upstream-image: phpswoole/swoole:php${{ matrix.php }}-alpine
+          version-command: php -r 'echo swoole_version();'
 
       - name: Get Docker Context
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
         run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
 
       - name: Generate Image Metadata
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ghcr.io/iksaku/laravel-alpine
-          tags: |
-            type=raw,${{ matrix.php }}-octane-${{ matrix.runtime }}
-            type=raw,${{ matrix.php }}.${{ env.PHP_RELEASE_VERSION }}-octane-${{ matrix.runtime }}
-            type=raw,${{ matrix.php }}.${{ env.PHP_RELEASE_VERSION }}-octane-${{ matrix.runtime }}-${{ env.RUNTIME_VERSION }}
+          tags:
+            type=raw,${{ matrix.php }}-octane-swoole
+            type=raw,${{ matrix.php }}-octane-swoole-${{ steps.swoole.outputs.version }}
+            type=raw,${{ steps.php.outputs.version }}-octane-swoole
+            type=raw,${{ steps.php.outputs.version }}-octane-swoole-${{ steps.swoole.outputs.version }}
 
       - name: Set up QEMU
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: docker/setup-qemu-action@v2
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: docker/setup-buildx-action@v2
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: docker/login-action@v2
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ github.event_name != 'schedule' || env.UP_TO_DATE == 'false' }}
-        uses: docker/build-push-action@v4
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
+        uses: docker/build-push-action@v5
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
-          file: ${{ env.DOCKER_BUILD_CONTEXT }}/Dockerfile.octane.${{ matrix.runtime }}
+          file: ${{ env.DOCKER_BUILD_CONTEXT }}/Dockerfile.octane.swoole
           build-args: |
             PHP_VERSION=${{ matrix.php }}
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ contains(fromJSON('["push", "schedule"]'), github.event_name) && github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}

@@ -1,0 +1,47 @@
+name: 'Check if runtime is up to date'
+
+inputs:
+  runtime-name:
+    description: 'Name of the runtime to print debug messages'
+    required: true
+  base-image:
+    description: 'The base image that may or may not be up to date'
+    required: true
+  upstream-image:
+    description: 'The upstream image that should always be up to date'
+    required: true
+  version-command:
+    description: 'Shared command used to extract runtime versions from both base and upstream images.'
+    required: false
+
+outputs:
+  outdated:
+    description: 'Whether the runtime is up to date'
+    value: ${{ steps.compare.outputs.result }}
+  version:
+    description: |
+      Most up to date runtime version.
+      If upstream-version results in a falsy (empty) value, use the base-version instead.
+    value: ${{ steps.upstream-version.outputs.version || steps.base-version.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: 'Get base runtime version'
+      id: base-version
+      shell: bash
+      run: echo "version=$(docker run --rm ${{ inputs.base-image }} ${{ inputs.version-command }})" >> $GITHUB_OUTPUT
+    
+    - name: 'Get upstream runtime version'
+      id: upstream-version
+      shell: bash
+      run: echo "version=$(docker run --rm ${{ inputs.upstream-image }} ${{ inputs.version-command }})" >> $GITHUB_OUTPUT
+    
+    - name: 'Compare runtime versions'
+      if: ${{ !cancelled() }}
+      id: compare
+      uses: ./.github/actions/version-outdated
+      with:
+        tool-name: ${{ inputs.runtime-name }}
+        base: ${{ steps.base-version.outputs.version }}
+        head: ${{ steps.upstream-version.outputs.version }}
