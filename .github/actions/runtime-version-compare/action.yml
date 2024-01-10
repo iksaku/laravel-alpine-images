@@ -7,15 +7,9 @@ inputs:
   base-image:
     description: 'The base image that may or may not be up to date'
     required: true
-  base-version-command:
-    description: 'The command used to extract runtime version from base image'
-    required: false
   upstream-image:
     description: 'The upstream image that should always be up to date'
     required: true
-  upstream-version-command:
-    description: 'The command used to extract the runtime version from upstream image.'
-    required: false
   version-command:
     description: 'Shared command used to extract runtime versions from both base and upstream images.'
     required: false
@@ -33,23 +27,15 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: ''
-      shell: bash
-      run: |
-        if [ -z "${{ inputs.version-command }}" ] && { [ -z "${{ inputs.base-version-command }}" ] || [ -z "${{ inputs.upstream-version-command }}" ]; }; then
-          echo 'Error: Please provide either a shared "version-command", or both "base-version-command" and "upstream-version-command"'
-          exit 1
-        fi
-
     - name: 'Get base runtime version'
       id: base-version
       shell: bash
-      run: echo "version=$(docker run --rm ${{ inputs.base-image }} ${{ inputs.base-version-command || inputs.version-command }})" >> $GITHUB_OUTPUT
+      run: echo "version=$(docker run --rm ${{ inputs.base-image }} ${{ inputs.version-command }})" >> $GITHUB_OUTPUT
     
     - name: 'Get upstream runtime version'
       id: upstream-version
       shell: bash
-      run: echo "version=$(docker run --rm ${{ inputs.upstream-image }} ${{ inputs.upstream-version-command || inputs.version-command }})" >> $GITHUB_OUTPUT
+      run: echo "version=$(docker run --rm ${{ inputs.upstream-image }} ${{ inputs.version-command }})" >> $GITHUB_OUTPUT
     
     - name: 'Compare runtime versions'
       if: ${{ !cancelled() }}
