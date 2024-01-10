@@ -1,5 +1,5 @@
 ARG PHP_VERSION
-FROM ghcr.io/iksaku/laravel-alpine:${PHP_VERSION}
+FROM ghcr.io/iksaku/laravel-alpine:${PHP_VERSION}-cli
 
 # Overwrite entrypoint to use Octane
 RUN sed -i \
