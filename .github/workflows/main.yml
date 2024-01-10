@@ -104,7 +104,7 @@ jobs:
         id: php
         uses: ./.github/actions/runtime-version-compare
         with:
-          runtime-name: PHP ${{ matrix.php }} (Octane RoadRunner)
+          runtime-name: PHP ${{ matrix.php }}
           base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-roadrunner
           upstream-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
           version-command: php -r 'echo PHP_VERSION;'
@@ -112,7 +112,7 @@ jobs:
         id: roadrunner
         uses: ./.github/actions/runtime-version-compare
         with:
-          runtime-name: PHP ${{ matrix.php }} (Octane RoadRunner)
+          runtime-name: RoadRunner
           base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-roadrunner rr
           upstream-image: ghcr.io/roadrunner-server/roadrunner:latest
           version-command: -v | sed -r 's/^rr version ([0-9\.]+) .*/\1/'
@@ -181,7 +181,7 @@ jobs:
         id: php
         uses: ./.github/actions/runtime-version-compare
         with:
-          runtime-name: PHP ${{ matrix.php }} (Octane Swoole)
+          runtime-name: PHP ${{ matrix.php }}
           base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-swoole
           upstream-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
           version-command: php -r 'echo PHP_VERSION;'
@@ -189,7 +189,7 @@ jobs:
         id: swoole
         uses: ./.github/actions/runtime-version-compare
         with:
-          runtime-name: PHP ${{ matrix.php }} (Octane Swoole)
+          runtime-name: Octane Swoole
           base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-swoole
           upstream-image: phpswoole/swoole:php${{ matrix.php }}-alpine
           version-command: php -r 'echo swoole_version();'
