@@ -34,7 +34,7 @@ runs:
       shell: bash
       run: |
         if [ -z "${{ inputs.base }}" ] || [ -z "${{ inputs.head }}" ]; then
-          echo "${{ inputs.tool-name }} appears to be new!."
+          echo "${{ inputs.tool-name }} (${{ inputs.base }}) appears to be new!."
         elif [ "${{ steps.compare.outputs.outdated }}" == "true" ]; then
           echo "A new version of ${{ inputs.tool-name }} is available (${{ inputs.base }} -> ${{ inputs.head }})."
         else
