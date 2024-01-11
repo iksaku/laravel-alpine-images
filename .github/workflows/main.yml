@@ -127,7 +127,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/iksaku/laravel-alpine
-          tags:
+          tags: |
             type=raw,${{ matrix.php }}-octane-roadrunner
             type=raw,${{ matrix.php }}-octane-roadrunner-${{ steps.roadrunner.outputs.version }}
             type=raw,${{ steps.php.outputs.version }}-octane-roadrunner
@@ -204,7 +204,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/iksaku/laravel-alpine
-          tags:
+          tags: |
             type=raw,${{ matrix.php }}-octane-swoole
             type=raw,${{ matrix.php }}-octane-swoole-${{ steps.swoole.outputs.version }}
             type=raw,${{ steps.php.outputs.version }}-octane-swoole
