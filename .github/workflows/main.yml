@@ -84,83 +84,6 @@ jobs:
           push: ${{ contains(fromJSON('["push", "schedule"]'), github.event_name) && github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
 
-  build-octane-roadrunner:
-    name: php-${{ matrix.php }}-octane-roadrunner
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: build
-    strategy:
-      matrix:
-        php:
-          - '8.0'
-          - '8.1'
-          - '8.2'
-          - '8.3'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      
-      - name: Check if PHP version is up to date
-        id: php
-        uses: ./.github/actions/runtime-version-compare
-        with:
-          runtime-name: PHP ${{ matrix.php }}
-          base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-roadrunner
-          upstream-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
-          version-command: php -r 'echo PHP_VERSION;'
-      - name: Check if RoadRunner version is up to date
-        id: roadrunner
-        uses: ./.github/actions/runtime-version-compare
-        with:
-          runtime-name: RoadRunner
-          base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-roadrunner rr
-          upstream-image: ghcr.io/roadrunner-server/roadrunner:latest
-          version-command: -v | sed -r 's/^rr version ([0-9\.]+) .*/\1/'
-
-      - name: Get Docker Context
-        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
-        run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
-
-      - name: Generate Image Metadata
-        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/iksaku/laravel-alpine
-          tags: |
-            type=raw,${{ matrix.php }}-octane-roadrunner
-            type=raw,${{ matrix.php }}-octane-roadrunner-${{ steps.roadrunner.outputs.version }}
-            type=raw,${{ steps.php.outputs.version }}-octane-roadrunner
-            type=raw,${{ steps.php.outputs.version }}-octane-roadrunner-${{ steps.roadrunner.outputs.version }}
-
-      - name: Set up QEMU
-        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push
-        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
-        uses: docker/build-push-action@v5
-        with:
-          context: ${{ env.DOCKER_BUILD_CONTEXT }}
-          file: ${{ env.DOCKER_BUILD_CONTEXT }}/Dockerfile.octane.roadrunner
-          build-args: |
-            PHP_VERSION=${{ matrix.php }}
-          platforms: linux/amd64,linux/arm64
-          push: ${{ contains(fromJSON('["push", "schedule"]'), github.event_name) && github.ref == 'refs/heads/main' }}
-          tags: ${{ steps.meta.outputs.tags }}
-
   build-octane-openswoole:
     name: php-${{ matrix.php }}-octane-openswoole
     runs-on: ubuntu-latest
@@ -232,6 +155,83 @@ jobs:
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
           file: ${{ env.DOCKER_BUILD_CONTEXT }}/Dockerfile.octane.openswoole
+          build-args: |
+            PHP_VERSION=${{ matrix.php }}
+          platforms: linux/amd64,linux/arm64
+          push: ${{ contains(fromJSON('["push", "schedule"]'), github.event_name) && github.ref == 'refs/heads/main' }}
+          tags: ${{ steps.meta.outputs.tags }}
+
+  build-octane-roadrunner:
+    name: php-${{ matrix.php }}-octane-roadrunner
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: build
+    strategy:
+      matrix:
+        php:
+          - '8.0'
+          - '8.1'
+          - '8.2'
+          - '8.3'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Check if PHP version is up to date
+        id: php
+        uses: ./.github/actions/runtime-version-compare
+        with:
+          runtime-name: PHP ${{ matrix.php }}
+          base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-roadrunner
+          upstream-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}
+          version-command: php -r 'echo PHP_VERSION;'
+      - name: Check if RoadRunner version is up to date
+        id: roadrunner
+        uses: ./.github/actions/runtime-version-compare
+        with:
+          runtime-name: RoadRunner
+          base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-roadrunner rr
+          upstream-image: ghcr.io/roadrunner-server/roadrunner:latest
+          version-command: -v | sed -r 's/^rr version ([0-9\.]+) .*/\1/'
+
+      - name: Get Docker Context
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
+
+      - name: Generate Image Metadata
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/iksaku/laravel-alpine
+          tags: |
+            type=raw,${{ matrix.php }}-octane-roadrunner
+            type=raw,${{ matrix.php }}-octane-roadrunner-${{ steps.roadrunner.outputs.version }}
+            type=raw,${{ steps.php.outputs.version }}-octane-roadrunner
+            type=raw,${{ steps.php.outputs.version }}-octane-roadrunner-${{ steps.roadrunner.outputs.version }}
+
+      - name: Set up QEMU
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.DOCKER_BUILD_CONTEXT }}
+          file: ${{ env.DOCKER_BUILD_CONTEXT }}/Dockerfile.octane.roadrunner
           build-args: |
             PHP_VERSION=${{ matrix.php }}
           platforms: linux/amd64,linux/arm64
