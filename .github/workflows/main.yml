@@ -85,7 +85,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
 
   build-octane-roadrunner:
-    name: php-${{ matrix.php }},octane-roadrunner
+    name: php-${{ matrix.php }}-octane-roadrunner
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: build
@@ -162,7 +162,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
 
   build-octane-swoole:
-    name: php-${{ matrix.php }},octane-swoole
+    name: php-${{ matrix.php }}-octane-swoole
     runs-on: ubuntu-latest
     timeout-minutes: 40
     needs: build
