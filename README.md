@@ -17,6 +17,7 @@ Currently, we are building the following images:
   * `ghcr.io/iksaku/laravel-alpine:8.0`
   * `ghcr.io/iksaku/laravel-alpine:8.1`
   * `ghcr.io/iksaku/laravel-alpine:8.2`
+  * `ghcr.io/iksaku/laravel-alpine:8.3`
 
 If you want to run [Laravel Octane](https://laravel.com/docs/octane), you can
 append `-octane-{runtime}` to the PHP version tag, where `{runtime}` could be
@@ -38,7 +39,7 @@ and also include a few extras for Database and Octane support:
 | ctype          | ✓                        |
 | curl           | ✓                        |
 | dom            | ✓                        |
-| fileinfo       | ✓                        |
+| fileinfo        | ✓                        |
 | intl           | ✓                        |
 | json           | ✓                        |
 | mbstring       | ✓                        |
@@ -55,7 +56,7 @@ and also include a few extras for Database and Octane support:
 | tokenizer      | ✓                        |
 | xml            | ✓                        |
 | composer       | ✓                        |
-| pcntl          | Octane-only              |
+| pcntl          | ✓                        |
 | sockets        | Octane-only (RoadRunner) |
 | swoole         | Octane-only (Swoole)     |
 
