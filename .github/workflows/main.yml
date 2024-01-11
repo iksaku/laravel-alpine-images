@@ -115,7 +115,7 @@ jobs:
           runtime-name: Octane OpenSwoole
           base-image: ghcr.io/iksaku/laravel-alpine:${{ matrix.php }}-octane-openswoole
           upstream-image: openswoole/swoole:php${{ matrix.php }}-alpine
-          version-command: php -r 'echo OPENSWOOLE_VERSION();'
+          version-command: php -r 'echo OPENSWOOLE_VERSION;'
 
       - name: Get Docker Context
         if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.openswoole.outputs.outdated == 'true' }}
