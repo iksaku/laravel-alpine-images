@@ -13,20 +13,20 @@ you need.
 ## Available Images
 
 You can choose the PHP version you want to run by specifying it as the tag for your image.
-Currently, we are building the following images:
+Currently, we are building the following base images:
   * `ghcr.io/iksaku/laravel-alpine:8.0`
   * `ghcr.io/iksaku/laravel-alpine:8.1`
   * `ghcr.io/iksaku/laravel-alpine:8.2`
   * `ghcr.io/iksaku/laravel-alpine:8.3`
 
-If you want to run [Laravel Octane](https://laravel.com/docs/octane), you can
-append `-octane-{runtime}` to the PHP version tag, where `{runtime}` could be
-either `roadrunner` or `swoole`. Example:
-  * `ghcr.io/iksaku/laravel-alpine:8.0-octane-roadrunner`
-  * `ghcr.io/iksaku/laravel-alpine:8.1-octane-swoole`
+We also build images compatible with [Laravel Octane](https://laravel.com/docs/octane),
+you can choose your favorite flavor from the following list:
 
-Checkout the available image tag list
-[here](https://github.com/iksaku/laravel-alpine-images/pkgs/container/laravel-alpine/versions?filters%5Bversion_type%5D=tagged).
+| Runtime      | Supported PHP versions | Image name example                                    |
+| ------------ | ---------------------- | ----------------------------------------------------- |
+| `openswoole` | `8.0`-`8.3`            | `ghcr.io/iksaku/laravel-alpine:8.3-octane-openswoole` |
+| `roadrunner` | `8.0`-`8.3`            | `ghcr.io/iksaku/laravel-alpine:8.3-octane-roadrunner` |
+| `swoole`     | `8.0`-`8.3`            | `ghcr.io/iksaku/laravel-alpine:8.3-octane-swoole`     |
 
 ### Available PHP extensions
 
@@ -57,6 +57,7 @@ and also include a few extras for Database and Octane support:
 | xml            | ✓                        |
 | composer       | ✓                        |
 | pcntl          | ✓                        |
+| openswoole     | Octane-only (OpenSwoole) |
 | sockets        | Octane-only (RoadRunner) |
 | swoole         | Octane-only (Swoole)     |
 

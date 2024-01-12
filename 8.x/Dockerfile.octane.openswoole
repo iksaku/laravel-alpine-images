@@ -1,0 +1,10 @@
+ARG PHP_VERSION
+FROM ghcr.io/iksaku/laravel-alpine:${PHP_VERSION}-cli
+
+# Overwrite entrypoint to use Octane
+RUN sed -i \
+    's/artisan serve/artisan octane:start --server=swoole/' \
+    /usr/local/bin/start-server
+
+# Install PHP extensions required by Octane
+RUN install-php-extensions openswoole
