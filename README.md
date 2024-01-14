@@ -13,17 +13,20 @@ you need.
 ## Available Images
 
 You can choose the PHP version you want to run by specifying it as the tag for your image.
-Currently, we are building the following base images:
+Currently, we build base images for PHP versions `8.0` to `8.3`:
   * `ghcr.io/iksaku/laravel-alpine:8.0`
   * `ghcr.io/iksaku/laravel-alpine:8.1`
   * `ghcr.io/iksaku/laravel-alpine:8.2`
   * `ghcr.io/iksaku/laravel-alpine:8.3`
+
+### Laravel Octane Images
 
 We also build images compatible with [Laravel Octane](https://laravel.com/docs/octane),
 you can choose your favorite flavor from the following list:
 
 | Runtime      | Supported PHP versions | Image name example                                    |
 | ------------ | ---------------------- | ----------------------------------------------------- |
+| `frankenphp` | `8.2`-`8.3`            | `ghcr.io/iksaku/laravel-alpine:8.3-octane-frankenphp` |
 | `openswoole` | `8.0`-`8.3`            | `ghcr.io/iksaku/laravel-alpine:8.3-octane-openswoole` |
 | `roadrunner` | `8.0`-`8.3`            | `ghcr.io/iksaku/laravel-alpine:8.3-octane-roadrunner` |
 | `swoole`     | `8.0`-`8.3`            | `ghcr.io/iksaku/laravel-alpine:8.3-octane-swoole`     |
@@ -61,7 +64,7 @@ and also include a few extras for Database and Octane support:
 | sockets        | Octane-only (RoadRunner) |
 | swoole         | Octane-only (Swoole)     |
 
-> **Note**
+> [!TIP]
 > You can always view the list of installed extensions from your terminal:
 > `docker run --rm ghcr.io/iksaku/laravel-alpine:8.1 php -m`
 
@@ -118,7 +121,7 @@ services:
 +       image: ghcr.io/iksaku/laravel-alpine:8.1
 ```
 
-> **Note**
+> [!TIP]
 > You can always update to the latest version of your chosen image
 > using `sail pull` 📥.
 
@@ -203,7 +206,7 @@ execute deployment scripts when a `RUN_DEPLOY_SCRIPTS` environment variable is a
 and has a value of `1`; otherwise, we ignore deployment scripts and jump straight
 into server execution.
 
-> **NOTE**
+> [!IMPORTANT]
 > `RUN_DEPLOY_SCRIPTS` is ignored when running in Laravel Sail to prevent unintended
 > side effects.
 
@@ -219,7 +222,7 @@ my-laravel-app/
 │   ...
 ```
 
-> **NOTE**
+> [!IMPORTANT]
 > Deploy scripts should be suffixed with the `.sh` extension and will be run using
 > Alpine's `sh` shell as we do not have `bash`.
 
@@ -266,7 +269,7 @@ that ping other services not in the VM, like Database migrations, will persist.
 Use the above mentioned `.deploy` directory if you are planning to execute commands like
 `artisan storage:link` or `artisan optimize`.
 
-> **Note**
+> [!NOTE]
 > The image's default entrypoint will manage this command, making
 > your script execution to be done by the `laravel` user, which is the
 > default one configured with all app permissions in your container.
