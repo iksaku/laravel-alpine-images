@@ -25,4 +25,6 @@ runs:
           echo 'tags=<<EOF'
           php generate-image-tags.php ${{ inputs.php }} ${{ inputs.octane-runtime }}
           echo EOF
-        } >> $GITHUB_OUTPUT
+        } >> "$GITHUB_OUTPUT"
+    - shell: bash
+      run: exit 1
