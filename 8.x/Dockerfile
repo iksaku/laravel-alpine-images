@@ -42,6 +42,6 @@ COPY shared/crontab /var/spool/cron/crontabs/root
 
 RUN useradd -ms /bin/sh -u 1337 -U laravel
 
-EXPOSE 8080
+EXPOSE 80
 
 ENTRYPOINT ["entrypoint"]

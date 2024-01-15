@@ -16,3 +16,7 @@ RUN sed -i \
 COPY --from=frankenphp /usr/local/bin/frankenphp /usr/local/bin/frankenphp
 
 RUN setcap "cap_net_bind_service=+ep" /usr/local/bin/frankenphp
+
+EXPOSE 443
+EXPOSE 443/udp
+EXPOSE 2019
