@@ -48,8 +48,8 @@ jobs:
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
         id: tags
         uses: ./.github/actions/generate-image-tags
-          with:
-            php: ${{ steps.php.outputs.version }}:${{ matrix.variant }}
+        with:
+          php: ${{ steps.php.outputs.version }}:${{ matrix.variant }}
 
       - name: Generate Image Metadata
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
@@ -126,9 +126,9 @@ jobs:
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
         id: tags
         uses: ./.github/actions/generate-image-tags
-          with:
-            php: ${{ steps.php.outputs.version }}
-            octane-runtime: frankenphp:${{ steps.frankenphp.outputs.version }}
+        with:
+          php: ${{ steps.php.outputs.version }}
+          octane-runtime: frankenphp:${{ steps.frankenphp.outputs.version }}
 
       - name: Generate Image Metadata
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
@@ -207,9 +207,9 @@ jobs:
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
         id: tags
         uses: ./.github/actions/generate-image-tags
-          with:
-            php: ${{ steps.php.outputs.version }}
-            octane-runtime: openswoole:${{ steps.openswoole.outputs.version }}
+        with:
+          php: ${{ steps.php.outputs.version }}
+          octane-runtime: openswoole:${{ steps.openswoole.outputs.version }}
 
       - name: Generate Image Metadata
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
@@ -288,9 +288,9 @@ jobs:
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
         id: tags
         uses: ./.github/actions/generate-image-tags
-          with:
-            php: ${{ steps.php.outputs.version }}
-            octane-runtime: roadrunner:${{ steps.roadrunner.outputs.version }}
+        with:
+          php: ${{ steps.php.outputs.version }}
+          octane-runtime: roadrunner:${{ steps.roadrunner.outputs.version }}
 
       - name: Generate Image Metadata
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
@@ -369,9 +369,9 @@ jobs:
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}
         id: tags
         uses: ./.github/actions/generate-image-tags
-          with:
-            php: ${{ steps.php.outputs.version }}
-            octane-runtime: swoole:${{ steps.swoole.outputs.version }}
+        with:
+          php: ${{ steps.php.outputs.version }}
+          octane-runtime: swoole:${{ steps.swoole.outputs.version }}
 
       - name: Generate Image Metadata
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}
