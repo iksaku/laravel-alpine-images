@@ -1,0 +1,22 @@
+name: 'Generate Image Tags'
+
+inputs:
+  php:
+    description: 'PHP version and (optional) variant'
+    required: true
+  octane-runtime:
+    description: 'Octane runtime and version'
+    required: false
+
+outputs:
+  tags:
+    description:
+    value: ${{ steps.tags.outputs.tags }}
+
+runs:
+  using: composite
+  steps:
+    - name: Generate Tags
+      id: tags
+      shell: bash
+      run: echo "tags=$(php generate-image-tags.php ${{ inputs.php }} ${{ inputs.octane-runtime }})" >> $GITHUB_OUTPUT
