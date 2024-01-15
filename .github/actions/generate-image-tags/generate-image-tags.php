@@ -131,4 +131,4 @@ $tags = array_merge(
 
 usort($tags, fn (Tag $a, Tag $b) => $b->priority <=> $a->priority);
 
-echo join(',', $tags);
+echo json_encode(join(PHP_EOL, $tags));

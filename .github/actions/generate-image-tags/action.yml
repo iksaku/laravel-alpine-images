@@ -22,5 +22,3 @@ runs:
       working-directory: ${{ github.action_path }}
       run: |
         echo "tags=$(php generate-image-tags.php ${{ inputs.php }} ${{ inputs.octane-runtime }})" >> $GITHUB_OUTPUT
-    - shell: bash
-      run: exit
