@@ -1,0 +1,18 @@
+ARG PHP_VERSION
+
+# Workaround as `COPY --from` doesn't support argument interpolation
+FROM dunglas/frankenphp:latest-php${PHP_VERSION}-alpine AS frankenphp
+
+FROM ghcr.io/iksaku/laravel-alpine:${PHP_VERSION}-zts
+
+RUN apk add --no-cache ca-certificates
+
+# Overwrite entrypoint to use Octane
+RUN sed -i \
+    's/artisan serve/artisan octane:start --server=frankenphp --admin-port=2019/' \
+    /usr/local/bin/start-server
+
+# Install FrankenPHP binary
+COPY --from=frankenphp /usr/local/bin/frankenphp /usr/local/bin/frankenphp
+
+RUN setcap "cap_net_bind_service=+ep" /usr/local/bin/frankenphp
