@@ -21,5 +21,5 @@ runs:
       shell: bash
       working-directory: ${{ github.action_path }}
       run: |
-        pwd
-        echo "tags=\"$(php generate-image-tags.php ${{ inputs.php }} ${{ inputs.octane-runtime }})\"" >> $GITHUB_OUTPUT
+        $TAGS=$(php generate-image-tags.php ${{ inputs.php }} ${{ inputs.octane-runtime }})
+        echo "tags=$TAGS" >> $GITHUB_OUTPUT
