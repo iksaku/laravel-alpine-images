@@ -57,8 +57,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/iksaku/laravel-alpine
-          tags: |
-            ${{ steps.tags.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags }}
 
       - name: Set up QEMU
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
@@ -137,8 +136,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/iksaku/laravel-alpine
-          tags: |
-            ${{ steps.tags.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags }}
 
       - name: Set up QEMU
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
@@ -219,8 +217,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/iksaku/laravel-alpine
-          tags: |
-            ${{ steps.tags.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags }}
 
       - name: Set up QEMU
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
@@ -301,8 +298,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/iksaku/laravel-alpine
-          tags: |
-            ${{ steps.tags.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags }}
 
       - name: Set up QEMU
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
@@ -383,8 +379,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/iksaku/laravel-alpine
-          tags: |
-            ${{ steps.tags.outputs.tags }}
+          tags: ${{ steps.tags.outputs.tags }}
 
       - name: Set up QEMU
         if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}

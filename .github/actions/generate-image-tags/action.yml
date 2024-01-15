@@ -20,4 +20,9 @@ runs:
       id: tags
       shell: bash
       working-directory: ${{ github.action_path }}
-      run: echo "tags=$(php generate-image-tags.php ${{ inputs.php }} ${{ inputs.octane-runtime }})" >> $GITHUB_OUTPUT
+      run: |
+        {
+          echo 'tags=<<EOF'
+          php generate-image-tags.php ${{ inputs.php }} ${{ inputs.octane-runtime }}
+          echo EOF
+        } >> $GITHUB_OUTPUT
