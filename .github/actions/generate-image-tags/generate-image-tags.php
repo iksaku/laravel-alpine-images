@@ -131,4 +131,4 @@ $tags = array_merge(
 
 usort($tags, fn (Tag $a, Tag $b) => $b->priority <=> $a->priority);
 
-echo join(PHP_EOL, $tags);
+echo join(PHP_EOL, $tags) . PHP_EOL;
