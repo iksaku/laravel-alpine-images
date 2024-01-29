@@ -41,18 +41,18 @@ jobs:
           version-command: php -r 'echo PHP_VERSION;'
 
       - name: Get Docker Context
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
         run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
 
       - name: Generate Image Tags
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
         id: tags
         uses: ./.github/actions/generate-image-tags
         with:
           php: ${{ steps.php.outputs.version }}:${{ matrix.variant }}
 
       - name: Generate Image Metadata
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -60,15 +60,15 @@ jobs:
           tags: ${{ fromJSON(steps.tags.outputs.tags) }}
 
       - name: Set up QEMU
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -76,7 +76,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
@@ -119,11 +119,11 @@ jobs:
           version-command: frankenphp -v | sed -r 's/FrankenPHP v([0-9\.]+) .*/\1/'
 
       - name: Get Docker Context
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.frankenphp.outputs.outdated == 'true' }}
         run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
 
       - name: Generate Image Tags
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.frankenphp.outputs.outdated == 'true' }}
         id: tags
         uses: ./.github/actions/generate-image-tags
         with:
@@ -131,7 +131,7 @@ jobs:
           octane-runtime: frankenphp:${{ steps.frankenphp.outputs.version }}
 
       - name: Generate Image Metadata
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.frankenphp.outputs.outdated == 'true' }}
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -139,15 +139,15 @@ jobs:
           tags: ${{ fromJSON(steps.tags.outputs.tags) }}
 
       - name: Set up QEMU
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.frankenphp.outputs.outdated == 'true' }}
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.frankenphp.outputs.outdated == 'true' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.frankenphp.outputs.outdated == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -155,7 +155,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.frankenphp.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.frankenphp.outputs.outdated == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
@@ -200,11 +200,11 @@ jobs:
           version-command: php -r 'echo OPENSWOOLE_VERSION;'
 
       - name: Get Docker Context
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.openswoole.outputs.outdated == 'true' }}
         run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
 
       - name: Generate Image Tags
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.openswoole.outputs.outdated == 'true' }}
         id: tags
         uses: ./.github/actions/generate-image-tags
         with:
@@ -212,7 +212,7 @@ jobs:
           octane-runtime: openswoole:${{ steps.openswoole.outputs.version }}
 
       - name: Generate Image Metadata
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.openswoole.outputs.outdated == 'true' }}
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -220,15 +220,15 @@ jobs:
           tags: ${{ fromJSON(steps.tags.outputs.tags) }}
 
       - name: Set up QEMU
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.openswoole.outputs.outdated == 'true' }}
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.openswoole.outputs.outdated == 'true' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.openswoole.outputs.outdated == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -236,7 +236,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.openswoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.openswoole.outputs.outdated == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
@@ -281,11 +281,11 @@ jobs:
           version-command: -v | sed -r 's/^rr version ([0-9\.]+) .*/\1/'
 
       - name: Get Docker Context
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
         run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
 
       - name: Generate Image Tags
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
         id: tags
         uses: ./.github/actions/generate-image-tags
         with:
@@ -293,7 +293,7 @@ jobs:
           octane-runtime: roadrunner:${{ steps.roadrunner.outputs.version }}
 
       - name: Generate Image Metadata
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -301,15 +301,15 @@ jobs:
           tags: ${{ fromJSON(steps.tags.outputs.tags) }}
 
       - name: Set up QEMU
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -317,7 +317,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.roadrunner.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.roadrunner.outputs.outdated == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
@@ -362,11 +362,11 @@ jobs:
           version-command: php -r 'echo swoole_version();'
 
       - name: Get Docker Context
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
         run: echo "DOCKER_BUILD_CONTEXT=$(echo ${{ matrix.php }} | sed -r 's/^([0-9]+)\..*$/\1.x/')" >> $GITHUB_ENV
 
       - name: Generate Image Tags
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
         id: tags
         uses: ./.github/actions/generate-image-tags
         with:
@@ -374,7 +374,7 @@ jobs:
           octane-runtime: swoole:${{ steps.swoole.outputs.version }}
 
       - name: Generate Image Metadata
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -382,15 +382,15 @@ jobs:
           tags: ${{ fromJSON(steps.tags.outputs.tags) }}
 
       - name: Set up QEMU
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -398,7 +398,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: ${{ github.event_name != 'schedule' || fromJSON(steps.php.outputs.outdated) || fromJSON(steps.swoole.outputs.outdated) }}
+        if: ${{ github.event_name != 'schedule' || steps.php.outputs.outdated == 'true' || steps.swoole.outputs.outdated == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: ${{ env.DOCKER_BUILD_CONTEXT }}
