@@ -11,3 +11,5 @@ RUN install-php-extensions sockets
 
 # Install RoadRunner binary
 COPY --from=ghcr.io/roadrunner-server/roadrunner:latest /usr/bin/rr /usr/local/bin/rr
+
+RUN setcap "cap_net_bind_service=+ep" /usr/local/bin/rr
