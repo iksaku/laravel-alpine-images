@@ -10,7 +10,7 @@ inputs:
 
 outputs:
   tags:
-    description:
+    description: 'JSON-encoded generated tags'
     value: ${{ steps.tags.outputs.tags }}
 
 runs:
